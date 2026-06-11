@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tout doux">
+<meta name="theme-color" content="#16140f">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAFJElEQVR4nO3dTW7cOhBF4XLwVpBRgOzAy/DCPPDCvAyvJwMCfIykq0gttXmLPN+oHQSIRB2XKP+kX37/+hnAlh+9DwC+iAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAem/3gdwm8+P196H8L+396/eh3CDl9T/1aRVEEreUFLGkaKJtXSVZIojaRNrWSpJsyH9/HjNsqb73t6/slSeYHJkWcoHmOfuPjk2yzBf002bx2zeve/kqAt3cA5bFXPwgNtzfPIRPcI0jrLDaJe4fLj+wx5Hd86Rs/DcUTnGsV649d8xXMp96iycW7fbc5TFqsu0+LC8dlvEIxaHXV4vbituWxCvyVFTWLwoMjaxaXM0ti+6HdnfjCaHKqMsls+SXdeeUd1ttC/6Hl7lMjkW27RRZ0ZLba189qdGcdTX/s94N3L+fLC4rah9mcMCPZvaejvcXPrH0S7KVFm0NhPp3kf/OIr18Jinj/VzSvcsis5xrO+ybo9z30Ode99KesaxGA/T3lOKzbHR9/v7dpMDTI4Nc95QWib70KpbHMyMfQ7zw2JyTL7baFk9sFjEAU994hjjRzSexOcHCpkckIgDEnFA6hAHG45/Mtl2jPNb9m4GeD4njvstPsXzfuWXPQck4riZ2hk4fMXzLOK4U8YCdhAHJOK4zf7YYEM6r8FuKAWPsjcYb2YUTA5IxHHVqGMjiOOigcsI4rhi7DKCOLCDOB40/NgI4njMDGUEcTxgkjKCOLCDOM6ZZ2wEcZwyVRlBHMfNVkYQB3YQxyETjo0gjiPmLCPG+HmOp/6GyLRlRPY4nv0bIkP+fNdxA95Wvu2Kjj02InUcOxHc0sfMN5QicRz7LvZBGTFwHHGhD8ooEsdx5CJNvqO8KHEcB53tg7FR5Y7j4KU63gdltHLHEbf2QRkL6eOIJ8wPFCPEEXf0wdhYGySOuNYHZWwaJ454tA/KUIaKI9h/3Gq0OOJkH4yNHQPGETfNj8nLiFHjiMuXljJi4DiCC3zZyHHEo31QVTF4HHH+SlNGNX4cceZ6U0arQxxd3i8i11U3edeRKSZH8c/FzRXQN5gojti9/JSxNlccQQRnvPz+9bPLP9z9tmr7TkrdV6bK/RtvV7g1YcjitmL1Ht19Wc2zbnG0J08Ta+2a9ArFYnIUZQlmDsXtrQI7x8H8WHOYGUXPON7evzYXYs5KNncbnx+vHfuwmxxz3lzUuc87OVqLsbEYKmOr48HqUSUc4mjXZdo7yyILk51p/zhia2y0H45tM4swKCNM4ijaJtrXoybSnlp7G3XIonCJo65O/QSqazTk/mPzBNfn3le3b7xtWuxG1bNudouTWp91tyP7m1ccIZ5WPKfuAzbvI2FZRhjGEeITa8FqEY9QZ+E8Gl32HK2yRpu794wb1cXGM1aPY4s/9OE4OQo1gRWrxT14wOb3St84iiPTOIWM90f3OGLoL4U5lxGee46Ft/cv27vyA+q5+J9OgslRDTNC/LMoMsVRJa0kSxNVyjiqFJWka6LKHUfLKpS8QbTGiQO3S/C0gl6IAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSH8AjQek0xFaEL4AAAAASUVORK5CYII=">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAFJElEQVR4nO3dTW7cOhBF4XLwVpBRgOzAy/DCPPDCvAyvJwMCfIykq0gttXmLPN+oHQSIRB2XKP+kX37/+hnAlh+9DwC+iAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAYk4IBEHJOKARByQiAMScUAiDkjEAem/3gdwm8+P196H8L+396/eh3CDl9T/1aRVEEreUFLGkaKJtXSVZIojaRNrWSpJsyH9/HjNsqb73t6/slSeYHJkWcoHmOfuPjk2yzBf002bx2zeve/kqAt3cA5bFXPwgNtzfPIRPcI0jrLDaJe4fLj+wx5Hd86Rs/DcUTnGsV649d8xXMp96iycW7fbc5TFqsu0+LC8dlvEIxaHXV4vbituWxCvyVFTWLwoMjaxaXM0ti+6HdnfjCaHKqMsls+SXdeeUd1ttC/6Hl7lMjkW27RRZ0ZLba189qdGcdTX/s94N3L+fLC4rah9mcMCPZvaejvcXPrH0S7KVFm0NhPp3kf/OIr18Jinj/VzSvcsis5xrO+ybo9z30Ode99KesaxGA/T3lOKzbHR9/v7dpMDTI4Nc95QWib70KpbHMyMfQ7zw2JyTL7baFk9sFjEAU994hjjRzSexOcHCpkckIgDEnFA6hAHG45/Mtl2jPNb9m4GeD4njvstPsXzfuWXPQck4riZ2hk4fMXzLOK4U8YCdhAHJOK4zf7YYEM6r8FuKAWPsjcYb2YUTA5IxHHVqGMjiOOigcsI4rhi7DKCOLCDOB40/NgI4njMDGUEcTxgkjKCOLCDOM6ZZ2wEcZwyVRlBHMfNVkYQB3YQxyETjo0gjiPmLCPG+HmOp/6GyLRlRPY4nv0bIkP+fNdxA95Wvu2Kjj02InUcOxHc0sfMN5QicRz7LvZBGTFwHHGhD8ooEsdx5CJNvqO8KHEcB53tg7FR5Y7j4KU63gdltHLHEbf2QRkL6eOIJ8wPFCPEEXf0wdhYGySOuNYHZWwaJ454tA/KUIaKI9h/3Gq0OOJkH4yNHQPGETfNj8nLiFHjiMuXljJi4DiCC3zZyHHEo31QVTF4HHH+SlNGNX4cceZ6U0arQxxd3i8i11U3edeRKSZH8c/FzRXQN5gojti9/JSxNlccQQRnvPz+9bPLP9z9tmr7TkrdV6bK/RtvV7g1YcjitmL1Ht19Wc2zbnG0J08Ta+2a9ArFYnIUZQlmDsXtrQI7x8H8WHOYGUXPON7evzYXYs5KNncbnx+vHfuwmxxz3lzUuc87OVqLsbEYKmOr48HqUSUc4mjXZdo7yyILk51p/zhia2y0H45tM4swKCNM4ijaJtrXoybSnlp7G3XIonCJo65O/QSqazTk/mPzBNfn3le3b7xtWuxG1bNudouTWp91tyP7m1ccIZ5WPKfuAzbvI2FZRhjGEeITa8FqEY9QZ+E8Gl32HK2yRpu794wb1cXGM1aPY4s/9OE4OQo1gRWrxT14wOb3St84iiPTOIWM90f3OGLoL4U5lxGee46Ft/cv27vyA+q5+J9OgslRDTNC/LMoMsVRJa0kSxNVyjiqFJWka6LKHUfLKpS8QbTGiQO3S/C0gl6IAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSH8AjQek0xFaEL4AAAAASUVORK5CYII=">
+<title>Tout doux — todo infinie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16140f;
+    --panel:#1e1b14;
+    --line:#33301f;
+    --line-soft:#2a271c;
+    --ink:#ede6d4;
+    --ink-dim:#9b9379;
+    --ink-faint:#67614c;
+    --amber:#d99a3c;
+    --amber-soft:#3a2f15;
+    --done:#4a8c6f;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:
+      radial-gradient(1200px 600px at 70% -10%, #221e15 0%, transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:760px;margin:0 auto;
+    padding:
+      calc(34px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right))
+      calc(100px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+  }
+
+  /* ---- Header / breadcrumb ---- */
+  header{margin-bottom:22px}
+  .crumbs{
+    display:flex;align-items:center;flex-wrap:wrap;gap:2px;
+    font-family:'Fraunces',serif;
+    margin-bottom:2px;
+  }
+  .crumb{
+    background:none;border:none;cursor:pointer;
+    color:var(--ink-dim);font-family:inherit;
+    font-size:15px;padding:4px 6px;border-radius:6px;
+    transition:color .15s,background .15s;
+  }
+  .crumb:hover{color:var(--ink);background:var(--line-soft)}
+  .crumb.current{
+    color:var(--ink);font-size:29px;font-weight:600;
+    padding:2px 0;cursor:default;letter-spacing:-.01em;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  .crumb.current:hover{background:none}
+  .logo{width:26px;height:26px;flex:none;display:block}
+  .sep{color:var(--ink-faint);font-size:13px;user-select:none}
+  .subtitle{color:var(--ink-faint);font-size:13px;margin-left:2px;
+    display:flex;gap:10px;align-items:center}
+  .subtitle:empty{display:none}
+
+  /* ---- Task list ---- */
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:8px}
+
+  /* Each top-level task is a distinct card */
+  .card{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    box-shadow:0 1px 0 rgba(0,0,0,.25), 0 6px 18px -12px rgba(0,0,0,.6);
+    overflow:hidden;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .card:hover{border-color:#3f3b27}
+  .card.dragover{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
+  .card.done{opacity:.62}
+
+  .task{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:11px 12px;
+    position:relative;
+  }
+  .task.dragover{background:var(--amber-soft);box-shadow:inset 0 0 0 1px var(--amber);border-radius:10px}
+
+  /* expand chevron — pure arrow, no text */
+  .twirl{
+    flex:none;width:22px;height:22px;margin-top:0;border-radius:6px;
+    background:none;border:none;cursor:pointer;color:var(--ink-faint);
+    display:grid;place-items:center;transition:.15s;
+  }
+  .twirl:hover{color:var(--amber);background:var(--line-soft)}
+  .twirl svg{width:12px;height:12px;transition:transform .18s}
+  .twirl.open svg{transform:rotate(90deg)}
+  .twirl.leaf{visibility:hidden}     /* keep alignment when no children */
+  .twirl.hidden{display:none}        /* card header: emoji replaces the chevron */
+  .card > .task > .twirl.leaf{display:none}  /* leaf card: no wasted chevron slot */
+
+  .check{
+    flex:none;width:20px;height:20px;margin-top:1px;border-radius:50%;
+    border:1.5px solid var(--ink-faint);background:none;cursor:pointer;
+    display:grid;place-items:center;transition:all .15s;
+  }
+  .check:hover{border-color:var(--amber)}
+  .check svg{width:11px;height:11px;opacity:0;transform:scale(.4);transition:.15s}
+  .task.done .check{background:var(--done);border-color:var(--done)}
+  .task.done .check svg{opacity:1;transform:scale(1)}
+
+  .body{flex:1;min-width:0}
+  .text{
+    font-size:16px;color:var(--ink);outline:none;
+    word-break:break-word;border-radius:4px;padding:1px 2px;
+  }
+  .text:focus{box-shadow:0 0 0 2px var(--amber-soft)}
+  .task.done .text{color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--ink-faint)}
+
+  /* ---- row actions (right side) ---- */
+  .actions{
+    flex:none;display:flex;align-items:center;gap:2px;margin-top:-2px;
+  }
+  /* On card headers, the badge owns the top-right; inline actions go bottom-right. */
+  .card > .task > .actions{
+    position:absolute;right:10px;bottom:8px;margin-top:0;
+  }
+  .act{
+    background:none;border:none;cursor:pointer;color:var(--ink-faint);
+    width:28px;height:28px;border-radius:7px;display:grid;place-items:center;
+    transition:.15s;opacity:0;
+  }
+  .act svg{width:15px;height:15px}
+  .task:hover .act,.node-row:hover .act{opacity:.7}
+  .act:hover{opacity:1;color:var(--ink);background:var(--line-soft)}
+  .act.dive:hover{color:var(--amber)}
+  .act.del:hover{color:#cf6a5a}
+  .handle{
+    flex:none;width:16px;align-self:stretch;cursor:grab;opacity:0;
+    color:var(--ink-faint);display:grid;place-items:center;font-size:13px;
+    transition:opacity .15s;margin:-2px -2px -2px -6px;
+  }
+  .task:hover .handle,.node-row:hover .handle{opacity:.45}
+  .handle:active{cursor:grabbing}
+
+  /* ---- New task input ---- */
+  .composer{
+    display:flex;align-items:center;gap:12px;margin-top:8px;
+    padding:11px 12px;border-radius:var(--radius);
+    border:1px dashed var(--line);transition:border-color .15s;
+  }
+  .composer:focus-within{border-color:var(--amber)}
+  .composer .plus{color:var(--amber);font-size:18px;line-height:1;flex:none}
+  .composer input{
+    flex:1;background:none;border:none;outline:none;color:var(--ink);
+    font-family:'Inter';font-size:16px;
+  }
+  .composer input::placeholder{color:var(--ink-faint)}
+
+  /* ---- nested subtree, drawn as an indented staircase ---- */
+  .subtree{
+    margin-left:30px;                 /* indent under the parent's text */
+    padding-left:0;
+    overflow:hidden;
+  }
+  .subtree.collapsed{display:none}
+
+  .node{
+    position:relative;
+    padding-left:22px;                /* room for the connector */
+  }
+  /* vertical spine running down a level */
+  .node::before{
+    content:"";position:absolute;left:6px;top:0;bottom:0;
+    width:1px;background:var(--line);
+  }
+  /* last child: spine stops at the elbow so it doesn't overshoot */
+  .node:last-child::before{bottom:calc(100% - 17px)}
+
+  .node-row{
+    display:flex;align-items:flex-start;gap:8px;
+    padding:6px 6px 6px 0;border-radius:8px;
+    position:relative;transition:background .12s;
+  }
+  /* horizontal elbow joining spine to the row */
+  .node-row::before{
+    content:"";position:absolute;left:-16px;top:16px;
+    width:14px;height:1px;background:var(--line);
+  }
+  .node-row:hover{background:var(--line-soft)}
+  .node-row.dragover{background:var(--amber-soft);box-shadow:inset 0 0 0 1px var(--amber)}
+
+  .node .twirl{width:20px;height:20px}
+  .node .check{width:18px;height:18px}
+  .node .text{font-size:14.5px}
+  .node.done > .node-row .text{
+    color:var(--ink-faint);text-decoration:line-through;text-decoration-color:var(--ink-faint);
+  }
+  .node.done > .node-row .check{background:var(--done);border-color:var(--done)}
+  .node.done > .node-row .check svg{opacity:1;transform:scale(1)}
+
+  .empty{
+    text-align:center;padding:38px 20px 30px;color:var(--ink-faint);
+  }
+  .empty .glyph{font-family:'Fraunces';font-size:46px;color:var(--line);margin-bottom:10px}
+  .empty p{font-size:14px;max-width:340px;margin:0 auto;line-height:1.6}
+  .empty em{font-style:italic;color:var(--ink-dim)}
+
+  .footnote{
+    margin-top:28px;padding-top:14px;border-top:1px solid var(--line-soft);
+    color:var(--ink-faint);font-size:12px;display:flex;justify-content:space-between;
+    flex-wrap:wrap;gap:8px;
+  }
+  .footnote a{color:var(--ink-dim);cursor:pointer;text-decoration:none}
+  .footnote a:hover{color:var(--amber)}
+
+  /* ---- emoji in the card's top-left corner (also the expand toggle) ---- */
+  .emoji-btn{
+    position:absolute;top:10px;left:10px;z-index:2;
+    width:32px;height:32px;border-radius:9px;
+    border:1px solid transparent;
+    background:rgba(255,255,255,.04);
+    font-size:18px;line-height:1;cursor:pointer;display:grid;place-items:center;
+    transition:.15s;
+  }
+  .emoji-btn:hover{border-color:var(--card-dot);background:rgba(255,255,255,.08)}
+  .emoji-btn.empty{font-size:15px;color:var(--ink-faint);opacity:0}
+  .card:hover .emoji-btn.empty{opacity:.6}
+  /* tiny caret hint showing the card can fold, only when it has children */
+  .emoji-btn.open::after,.emoji-btn:not(.open).has-fold::after{content:none}
+  /* make room for the corner emoji */
+  .card.has-emoji > .task{padding-left:50px}
+  .card.has-emoji > .subtree{padding-left:50px!important}
+
+  /* ---- top-right metrics badge + color dot ---- */
+  .topright{
+    position:absolute;top:10px;right:12px;
+    display:flex;align-items:center;gap:9px;
+    pointer-events:auto;
+  }
+  .card > .task{padding-right:118px;padding-bottom:34px;min-height:56px}   /* room for badge (top-right) + actions (bottom-right) */
+  .badge{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--ink-faint)}
+  .b-prog{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+  .b-bar{width:42px;height:4px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+  .b-bar > i{display:block;height:100%;background:var(--card-dot);width:0}
+  .b-lvl{
+    white-space:nowrap;padding:1px 6px;border-radius:99px;
+    background:rgba(255,255,255,.05);color:var(--ink-dim);
+  }
+  .color-btn{
+    width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.15);
+    cursor:pointer;padding:0;flex:none;transition:.15s;
+  }
+  .color-btn:hover{transform:scale(1.15);border-color:rgba(255,255,255,.4)}
+
+  /* ---- attribute chips ---- */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .chip{
+    display:inline-flex;align-items:center;gap:5px;font-size:11.5px;
+    padding:2px 8px;border-radius:99px;border:1px solid var(--line);
+    color:var(--ink-dim);background:rgba(0,0,0,.15);
+  }
+  .chip i{width:7px;height:7px;border-radius:50%;flex:none}
+  .chip svg{width:12px;height:12px}
+  .chip.date.soon{color:var(--amber);border-color:#4a3a1a}
+  .chip.date.overdue{color:#cf6a5a;border-color:#4a2420}
+
+  /* ---- popovers ---- */
+  .pop{
+    position:fixed;z-index:50;background:#211d15;border:1px solid var(--line);
+    border-radius:12px;padding:10px;box-shadow:0 12px 40px -8px rgba(0,0,0,.7);
+    animation:pop .12s ease-out;
+  }
+  @keyframes pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+  .pop-emoji{width:236px}
+  .emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px}
+  .emoji-grid button{
+    background:none;border:none;cursor:pointer;font-size:18px;
+    width:27px;height:27px;border-radius:7px;transition:.1s;
+  }
+  .emoji-grid button:hover{background:var(--line-soft);transform:scale(1.15)}
+  .pop-clear,.date-clear{
+    margin-top:8px;width:100%;background:none;border:1px solid var(--line);
+    color:var(--ink-dim);border-radius:8px;padding:5px;cursor:pointer;font-size:12px;
+  }
+  .pop-clear:hover{color:#cf6a5a;border-color:#4a2420}
+  .color-row{display:flex;gap:8px}
+  .swatch{
+    width:26px;height:26px;border-radius:50%;border:2px solid transparent;
+    cursor:pointer;padding:0;transition:.12s;
+  }
+  .swatch:hover{transform:scale(1.15)}
+  .swatch.sel{border-color:var(--ink);box-shadow:0 0 0 2px #211d15,0 0 0 3px var(--ink)}
+  .pop-attr{width:220px}
+  .pop-h{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--ink-faint);margin:2px 2px 6px}
+  .pop-h:not(:first-child){margin-top:12px}
+  .status-row{display:flex;flex-direction:column;gap:3px}
+  .status-opt{
+    display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;
+    color:var(--ink-dim);font-size:13px;font-family:'Inter';text-align:left;
+    padding:6px 8px;border-radius:7px;transition:.1s;
+  }
+  .status-opt i{width:9px;height:9px;border-radius:50%;flex:none}
+  .status-opt:hover{background:var(--line-soft);color:var(--ink)}
+  .status-opt.sel{background:var(--line-soft);color:var(--ink)}
+  .date-row{display:flex;gap:6px;align-items:center}
+  .date-input{
+    flex:1;background:#16140f;border:1px solid var(--line);color:var(--ink);
+    border-radius:8px;padding:6px 8px;font-family:'Inter';font-size:13px;
+    color-scheme:dark;
+  }
+  .date-clear{margin-top:0;width:32px;flex:none;font-size:16px;line-height:1}
+
+  /* ---- action menu (mobile ⋯) ---- */
+  .pop-menu{width:208px;padding:6px}
+  .menu-item{
+    display:flex;align-items:center;gap:11px;width:100%;
+    background:none;border:none;cursor:pointer;text-align:left;
+    color:var(--ink);font-family:'Inter';font-size:14px;
+    padding:10px 10px;border-radius:9px;transition:.1s;
+  }
+  .menu-item:hover,.menu-item:active{background:var(--line-soft)}
+  .menu-item.danger{color:#cf6a5a}
+  .mi-ic{display:grid;place-items:center;width:18px;height:18px;flex:none;color:var(--ink-dim)}
+  .mi-ic svg{width:16px;height:16px}
+  .menu-item.danger .mi-ic{color:#cf6a5a}
+
+  /* The ⋯ overflow button is desktop-hidden; inline buttons are mobile-hidden. */
+  .act.more{display:none}
+
+  @media (max-width:600px){
+    .wrap{padding:
+      calc(20px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right))
+      calc(88px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
+    }
+    .crumb.current{font-size:24px}
+    .logo{width:21px;height:21px}
+
+    /* keep every row strictly horizontal */
+    .task,.node-row{flex-wrap:nowrap}
+
+    /* collapse the action cluster to a single ⋯ menu */
+    .actions .act{display:none}
+    .actions .act.more{display:grid;opacity:.7}
+
+    /* emoji tight in the corner */
+    .emoji-btn{width:28px;height:28px;top:9px;left:9px;font-size:16px}
+    .card.has-emoji > .task{padding-left:42px}
+    .card.has-emoji > .subtree{padding-left:22px!important}
+
+    .handle{display:none}
+    .task{gap:9px;padding:10px 10px}
+    .node-row{gap:8px;padding-top:7px;padding-bottom:7px}
+
+    /* badge: progress only; level pill + colour dot hidden to save width */
+    .card > .task{padding-right:104px;padding-bottom:10px;min-height:0}
+    .topright{top:11px;right:38px;gap:0}
+    .b-lvl{display:none}
+    .color-btn{display:none}
+    .b-bar{width:30px}
+    .badge{font-size:10.5px}
+    /* ⋯ pinned far right, aligned with the badge row */
+    .card > .task > .actions{position:absolute;top:7px;right:8px}
+
+    .twirl{width:24px;height:24px}
+    .check{width:22px;height:22px}
+    .node .check{width:20px;height:20px}
+  }
+
+  /* Touch devices have no hover: reveal the overflow trigger permanently */
+  @media (hover:none){
+    .act.more{opacity:.75}
+    .emoji-btn.empty{opacity:.5}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <nav class="crumbs" id="crumbs"></nav>
+    <div class="subtitle" id="subtitle"></div>
+  </header>
+
+  <ul class="list" id="list"></ul>
+
+  <div class="composer">
+    <span class="plus">+</span>
+    <input id="composer" type="text" autocomplete="off"
+           placeholder="Ajouter une tâche…   (Entrée)">
+  </div>
+
+  <div class="footnote">
+    <span>Tout doux · tout est enregistré sur cet appareil</span>
+    <span><a id="export">exporter</a> · <a id="import">importer</a></span>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const STORE = "tiroir.v1";
+  const uid = () => Math.random().toString(36).slice(2,9);
+
+  // Tree: { id, text, done, children:[] }. Virtual root holds everything.
+  let root = load();
+  let path = [root.id];            // ids from root → current focus
+  let nodes = new Map();           // id -> node, rebuilt on render
+  let closedPreviews = new Set();  // ids the user explicitly collapsed (open is default)
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORE);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return { id:"root", text:"Tout doux", done:false, children:[
+      { id:uid(), text:"Liste de courses", done:false, emoji:"🛒", color:"green", children:[
+        { id:uid(), text:"Légumes", done:false, children:[
+          { id:uid(), text:"Tomates", done:false, children:[] },
+          { id:uid(), text:"Courgettes", done:false, children:[] }
+        ]},
+        { id:uid(), text:"Pain", done:false, children:[] }
+      ]},
+      { id:uid(), text:"Projet vidéo", done:false, emoji:"🎬", color:"blue", status:"doing", children:[
+        { id:uid(), text:"Dérush", done:true, children:[] },
+        { id:uid(), text:"Montage", done:false, status:"doing", children:[] },
+        { id:uid(), text:"Étalonnage", done:false, status:"todo", children:[] }
+      ]}
+    ]};
+  }
+  function save(){ localStorage.setItem(STORE, JSON.stringify(root)); }
+
+  function index(node){
+    nodes.set(node.id, node);
+    node.children.forEach(index);
+  }
+  function current(){ return nodes.get(path[path.length-1]); }
+
+  // count leaves done/total recursively for progress
+  function stats(node){
+    let done=0,total=0;
+    for(const c of node.children){
+      total++; if(c.done) done++;
+      const s = stats(c); done+=s.done; total+=s.total;
+    }
+    return {done,total};
+  }
+  function depthCount(node){
+    if(!node.children.length) return 0;
+    return 1+Math.max(...node.children.map(depthCount));
+  }
+
+  // ---- card color palette (name -> accent + soft tint) ----
+  const COLORS = {
+    slate:  {dot:"#7d8aa0", tint:"#1d2330", line:"#2c3547"},
+    blue:   {dot:"#4a78b0", tint:"#161f2e", line:"#243349"},
+    green:  {dot:"#4a8c6f", tint:"#152620", line:"#21392f"},
+    amber:  {dot:"#d99a3c", tint:"#241c0f", line:"#3a2f15"},
+    rose:   {dot:"#cf6a7a", tint:"#271317", line:"#3d2026"},
+    violet: {dot:"#9b7bc4", tint:"#1f1830", line:"#2f2647"},
+    teal:   {dot:"#48a0a8", tint:"#10242630",line:"#1d3a3d"},
+  };
+  const COLOR_ORDER = ["slate","blue","green","amber","rose","violet","teal"];
+
+  // ---- task status definitions ----
+  const STATUS = {
+    todo:    {label:"À faire",   dot:"#7d8aa0"},
+    doing:   {label:"En cours",  dot:"#4a78b0"},
+    waiting: {label:"En attente",dot:"#d99a3c"},
+    urgent:  {label:"Urgent",    dot:"#cf6a5a"},
+    done:    {label:"Terminé",   dot:"#4a8c6f"},
+  };
+  const STATUS_ORDER = ["todo","doing","waiting","urgent"];
+
+  function fmtDate(iso){
+    if(!iso) return "";
+    const d=new Date(iso+"T00:00:00");
+    const today=new Date(); today.setHours(0,0,0,0);
+    const diff=Math.round((d-today)/86400000);
+    const s=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+    if(diff===0) return "aujourd’hui";
+    if(diff===1) return "demain";
+    if(diff===-1) return "hier";
+    if(diff<0) return s+" · en retard";
+    if(diff<7) return s;
+    return s;
+  }
+  function dateState(iso){
+    if(!iso) return "";
+    const d=new Date(iso+"T00:00:00");
+    const today=new Date(); today.setHours(0,0,0,0);
+    const diff=Math.round((d-today)/86400000);
+    if(diff<0) return "overdue";
+    if(diff<=1) return "soon";
+    return "";
+  }
+
+  // ---------- render ----------
+  const $list = document.getElementById('list');
+  const $crumbs = document.getElementById('crumbs');
+  const $subtitle = document.getElementById('subtitle');
+
+  function render(){
+    nodes = new Map(); index(root);
+    // sanitize path (in case of deletions)
+    path = path.filter(id => nodes.has(id));
+    if(!path.length) path=[root.id];
+
+    renderCrumbs();
+    renderSubtitle();
+    renderTasks();
+    save();
+  }
+
+  function renderCrumbs(){
+    $crumbs.innerHTML="";
+    path.forEach((id,i)=>{
+      const node = nodes.get(id);
+      const last = i===path.length-1;
+      const b = document.createElement('button');
+      b.className = "crumb"+(last?" current":"");
+      if(node===root){
+        if(last){
+          b.innerHTML=`<svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="25" height="25" rx="9" stroke="#d99a3c" stroke-width="2.2"/>
+            <path d="M10.5 17 14.5 21 21.5 11.5" stroke="#d99a3c" stroke-width="2.4"
+              stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>Tout doux`;
+        } else {
+          b.textContent="Tout doux";
+        }
+      } else {
+        b.textContent = node.emoji? node.emoji+" "+node.text : node.text;
+      }
+      if(!last) b.onclick = ()=>{ path = path.slice(0,i+1); render(); };
+      $crumbs.appendChild(b);
+      if(!last){
+        const s=document.createElement('span');
+        s.className="sep"; s.textContent="ᐳ"; $crumbs.appendChild(s);
+      }
+    });
+  }
+
+  function renderSubtitle(){
+    const node = current();
+    $subtitle.textContent = node.children.length ? "" : "aucune tâche pour l’instant";
+    // Per-card progress and depth live on each card's badge — no global counter here.
+  }
+
+  function renderTasks(){
+    const node = current();
+    $list.innerHTML="";
+    if(!node.children.length){
+      const e=document.createElement('div');
+      e.className="empty";
+      e.innerHTML=`<div class="glyph">⌑</div><p>Rien ici encore.<br>
+        Ajoute une tâche ci-dessous, puis déplie-la avec la flèche pour y nicher des sous-tâches.</p>`;
+      $list.appendChild(e);
+      return;
+    }
+    node.children.forEach((child,i)=> $list.appendChild(cardEl(child, node, i)));
+  }
+
+  // SVG icon helpers
+  const ICON = {
+    chevron:`<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.7"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>`,
+    check:`<svg viewBox="0 0 12 12" fill="none" stroke="#16140f" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M2 6.2 4.6 9 10 3"/></svg>`,
+    dive:`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h6.5V10M12.5 3.5 7 9"/><path d="M3.5 6.5V13H10"/></svg>`,
+    plus:`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round"><path d="M8 3.5v9M3.5 8h9"/></svg>`,
+    trash:`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M5 4.5l.5 8h5l.5-8"/></svg>`,
+    tag:`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.2V3.2A.7.7 0 0 1 3.2 2.5h4l6 6a1 1 0 0 1 0 1.4l-3.3 3.3a1 1 0 0 1-1.4 0l-6-6Z"/><circle cx="5.3" cy="5.3" r=".9" fill="currentColor" stroke="none"/></svg>`,
+    more:`<svg viewBox="0 0 16 16" fill="currentColor" stroke="none"><circle cx="3" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="13" cy="8" r="1.5"/></svg>`,
+    smiley:`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
+      stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M5.5 9.5a3 3 0 0 0 5 0"/><circle cx="6" cy="6.5" r=".6" fill="currentColor" stroke="none"/><circle cx="10" cy="6.5" r=".6" fill="currentColor" stroke="none"/></svg>`,
+    palette:`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M8 2a6 6 0 0 0 0 12c1 0 1.5-.8 1-1.6-.4-.7 0-1.4.8-1.4H11a3 3 0 0 0 3-3c0-3.3-2.7-5-6-5Z"/><circle cx="5.5" cy="7" r=".7" fill="currentColor" stroke="none"/><circle cx="8" cy="5.5" r=".7" fill="currentColor" stroke="none"/><circle cx="10.5" cy="7" r=".7" fill="currentColor" stroke="none"/></svg>`
+  };
+
+  // A single task row (twirl, check, editable text, actions). depth>=0.
+  function rowEl(t, parent, i, depth, extraActs){
+    const row=document.createElement('div');
+    row.className=(depth===0?"task":"node-row")+(t.done?" done":"");
+
+    // drag handle
+    const handle=document.createElement('div');
+    handle.className="handle"; handle.textContent="⠿"; handle.draggable=true;
+    setupDrag(handle, row, t, parent, i);
+
+    // twirl (expand) — only meaningful if it has children
+    const twirl=document.createElement('button');
+    const hasKids=t.children.length>0;
+    const open=hasKids && !closedPreviews.has(t.id);
+    twirl.className="twirl"+(hasKids?"":" leaf")+(open?" open":"");
+    twirl.innerHTML=ICON.chevron;
+    twirl.title=open?"Replier":"Déplier";
+    if(hasKids){
+      twirl.onclick=()=>{
+        if(closedPreviews.has(t.id)) closedPreviews.delete(t.id);
+        else closedPreviews.add(t.id);
+        render();
+      };
+    }
+
+    // checkbox
+    const check=document.createElement('button');
+    check.className="check"; check.title="Terminer"; check.innerHTML=ICON.check;
+    check.onclick=()=>toggle(t);
+
+    // body / editable text
+    const body=document.createElement('div'); body.className="body";
+    const text=document.createElement('div');
+    text.className="text"; text.contentEditable="true"; text.spellcheck=false;
+    text.textContent=t.text;
+    text.onblur=()=>{ const v=text.textContent.trim(); t.text=v||"(sans titre)";
+      if(!v)text.textContent=t.text; save(); renderCrumbs(); };
+    text.onkeydown=(e)=>{
+      if(e.key==="Enter"){ e.preventDefault(); text.blur(); }
+    };
+    body.appendChild(text);
+
+    // attribute chips (status + due date), shown when set
+    if(t.status || t.due){
+      const chips=document.createElement('div'); chips.className="chips";
+      if(t.status && STATUS[t.status]){
+        const c=document.createElement('span');
+        c.className="chip status "+t.status;
+        c.innerHTML=`<i style="background:${STATUS[t.status].dot}"></i>${STATUS[t.status].label}`;
+        chips.appendChild(c);
+      }
+      if(t.due){
+        const c=document.createElement('span');
+        const st=dateState(t.due);
+        c.className="chip date "+st;
+        c.innerHTML=`<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"
+          stroke-linecap="round"><rect x="2" y="3" width="10" height="9" rx="1.5"/><path d="M2 5.5h10M4.5 2v2M9.5 2v2"/></svg>${fmtDate(t.due)}`;
+        chips.appendChild(c);
+      }
+      body.appendChild(chips);
+    }
+
+    // ---- actions: shared definitions, rendered inline (desktop) + as a ⋯ menu (mobile) ----
+    const baseActs=[
+      {key:"add", label:"Ajouter une sous-tâche", icon:ICON.plus, cls:"", run:()=>{
+        const c={id:uid(),text:"",done:false,children:[]};
+        t.children.push(c); closedPreviews.delete(t.id); render(); focusNode(c.id);
+      }},
+      {key:"tag", label:"Statut & échéance", icon:ICON.tag, cls:"", run:(anchor)=>openAttrPopover(t, anchor)},
+      {key:"dive", label:"Zoomer sur cette tâche", icon:ICON.dive, cls:"dive", run:()=>{
+        path.push(t.id); render(); window.scrollTo({top:0,behavior:'smooth'});
+      }},
+      {key:"del", label:"Supprimer", icon:ICON.trash, cls:"del", run:()=>remove(t,parent)},
+    ];
+    const menuActs = (extraActs||[]).concat(baseActs);  // extras (emoji/color) first in the menu
+
+    const actions=document.createElement('div'); actions.className="actions";
+    // inline buttons for the base actions (desktop hover); extras live in the ⋯ menu only
+    baseActs.forEach(a=>{
+      const b=document.createElement('button');
+      b.className="act "+a.cls; b.innerHTML=a.icon; b.title=a.label;
+      b.onclick=(e)=>{ e.stopPropagation(); a.run(b); };
+      actions.appendChild(b);
+    });
+    // overflow "⋯" → full menu (shown on mobile; on desktop also available for extras)
+    const more=document.createElement('button');
+    more.className="act more"; more.innerHTML=ICON.more; more.title="Actions";
+    more.onclick=(e)=>{ e.stopPropagation(); openActionMenu(menuActs, more); };
+    actions.appendChild(more);
+
+    row.append(handle,twirl,check,body,actions);
+    return row;
+  }
+
+  // A node in the nested subtree: its row + (recursively) its own subtree.
+  function nodeEl(t, parent, i, depth){
+    const node=document.createElement('div');
+    node.className="node"+(t.done?" done":"");
+    node.dataset.id=t.id;
+    node.appendChild(rowEl(t, parent, i, depth));
+    if(t.children.length){
+      const open=!closedPreviews.has(t.id);
+      const sub=document.createElement('div');
+      sub.className="subtree"+(open?"":" collapsed");
+      t.children.forEach((c,j)=> sub.appendChild(nodeEl(c, t, j, depth+1)));
+      node.appendChild(sub);
+    }
+    return node;
+  }
+
+  // A top-level card: emoji + colored block + metrics badge + nested subtree.
+  function cardEl(t, parent, i){
+    const card=document.createElement('div');
+    const col=COLORS[t.color]||COLORS.slate;
+    card.className="card"+(t.done?" done":"");
+    card.dataset.id=t.id;
+    card.style.background=col.tint;
+    card.style.borderColor=col.line;
+    card.style.setProperty('--card-dot',col.dot);
+
+    // Card-only extra actions, surfaced in the ⋯ menu (emoji + colour).
+    const extraActs=[
+      {key:"emoji", label:t.emoji?"Changer l’emoji":"Ajouter un emoji", icon:ICON.smiley, cls:"",
+        run:(anchor)=>openEmojiPicker(t, anchor)},
+      {key:"color", label:"Couleur du bloc", icon:ICON.palette, cls:"",
+        run:(anchor)=>openColorPicker(t, anchor)},
+    ];
+    const header=rowEl(t, parent, i, 0, extraActs);
+
+    // Emoji in the corner is purely for identity — it opens the picker.
+    const hasKids=t.children.length>0;
+    const open=hasKids && !closedPreviews.has(t.id);
+    const emojiBtn=document.createElement('button');
+    emojiBtn.className="emoji-btn";
+    emojiBtn.textContent=t.emoji||"＋";
+    if(!t.emoji) emojiBtn.classList.add('empty');
+    emojiBtn.title=t.emoji?"Changer l’emoji":"Choisir un emoji";
+    emojiBtn.onclick=(e)=>{ e.stopPropagation(); openEmojiPicker(t, emojiBtn); };
+    // The chevron (in the row) stays as the fold control — it already works for all rows.
+
+    // metrics badge (top-right): progress + depth, per card
+    const s=stats(t);
+    const d=depthCount(t);
+    const badge=document.createElement('div'); badge.className="badge";
+    const pct=s.total?Math.round(s.done/s.total*100):0;
+    let bits=[];
+    if(s.total) bits.push(`<span class="b-prog"><span class="b-bar"><i style="width:${pct}%"></i></span>${s.done}/${s.total}</span>`);
+    if(d>1) bits.push(`<span class="b-lvl">${d}\u202fniv.</span>`);
+    badge.innerHTML=bits.join("");
+
+    // small color dot — quick affordance on desktop (hidden on mobile, lives in menu)
+    const colorBtn=document.createElement('button');
+    colorBtn.className="color-btn"; colorBtn.title="Couleur du bloc";
+    colorBtn.style.background=col.dot;
+    colorBtn.onclick=(e)=>{ e.stopPropagation(); openColorPicker(t, colorBtn); };
+
+    const topright=document.createElement('div'); topright.className="topright";
+    topright.append(badge, colorBtn);
+    header.appendChild(topright);
+
+    card.classList.add('has-emoji');
+    card.appendChild(emojiBtn);
+    card.appendChild(header);
+
+    if(t.children.length){
+      const open=!closedPreviews.has(t.id);
+      const sub=document.createElement('div');
+      sub.className="subtree"+(open?"":" collapsed");
+      sub.style.padding="0 12px 10px 28px";
+      sub.style.marginLeft="0";
+      t.children.forEach((c,j)=> sub.appendChild(nodeEl(c, t, j, 1)));
+      card.appendChild(sub);
+    }
+    return card;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  function focusNode(id){
+    requestAnimationFrame(()=>{
+      const el=$list.querySelector(`[data-id="${id}"] .text`);
+      if(el){ el.focus();
+        const r=document.createRange(); r.selectNodeContents(el);
+        r.collapse(false); const s=getSelection(); s.removeAllRanges(); s.addRange(r);}
+    });
+  }
+
+  // ---------- mutations ----------
+  function toggle(t){
+    t.done=!t.done;
+    // cascade down so completing a parent completes its branch
+    const cascade=(node,val)=>{ node.children.forEach(c=>{c.done=val;cascade(c,val);});};
+    cascade(t,t.done);
+    render();
+  }
+  function remove(t,parent){
+    parent.children=parent.children.filter(c=>c.id!==t.id);
+    render();
+  }
+  function addTop(text){
+    current().children.push({id:uid(),text,done:false,children:[]});
+    render();
+  }
+
+  // ---------- popover system ----------
+  let activePop=null;
+  function closePop(){ if(activePop){ activePop.remove(); activePop=null;
+    document.removeEventListener('mousedown',onDocDown,true); } }
+  function onDocDown(e){ if(activePop && !activePop.contains(e.target)) closePop(); }
+  function openPop(anchor, build){
+    closePop();
+    const pop=document.createElement('div'); pop.className="pop";
+    build(pop);
+    document.body.appendChild(pop);
+    const r=anchor.getBoundingClientRect();
+    const pw=pop.offsetWidth, ph=pop.offsetHeight;
+    let left=r.left, top=r.bottom+6;
+    if(left+pw>innerWidth-10) left=innerWidth-pw-10;
+    if(left<10) left=10;
+    if(top+ph>innerHeight-10) top=r.top-ph-6;
+    pop.style.left=left+"px"; pop.style.top=Math.max(10,top)+"px";
+    activePop=pop;
+    setTimeout(()=>document.addEventListener('mousedown',onDocDown,true),0);
+  }
+
+  const EMOJIS = ["🛒","🎬","🎞️","📹","✍️","📝","💼","💰","📅","🏠","🧹","🍳","🥕","🎂",
+    "✈️","🏖️","🎁","🎉","📚","🎓","💡","🔧","🛠️","🎹","🎸","🎮","🐱","🌿","💍","❤️",
+    "⭐","🔥","⚡","✅","📌","📎","🧠","🩺","🏃","⚽","🎨","📷","☕","🍷","🌍","🚗"];
+  function openActionMenu(acts, anchor){
+    openPop(anchor, pop=>{
+      pop.classList.add('pop-menu');
+      acts.forEach(a=>{
+        const b=document.createElement('button');
+        b.className="menu-item"+(a.cls==="del"?" danger":"");
+        b.innerHTML=`<span class="mi-ic">${a.icon}</span>${a.label}`;
+        b.onclick=()=>{ closePop(); a.run(anchor); };
+        pop.appendChild(b);
+      });
+    });
+  }
+
+  function openEmojiPicker(t, anchor){
+    openPop(anchor, pop=>{
+      pop.classList.add('pop-emoji');
+      const grid=document.createElement('div'); grid.className="emoji-grid";
+      EMOJIS.forEach(e=>{
+        const b=document.createElement('button'); b.textContent=e;
+        b.onclick=()=>{ t.emoji=e; closePop(); render(); };
+        grid.appendChild(b);
+      });
+      pop.appendChild(grid);
+      if(t.emoji){
+        const clr=document.createElement('button'); clr.className="pop-clear";
+        clr.textContent="Retirer l’emoji";
+        clr.onclick=()=>{ delete t.emoji; closePop(); render(); };
+        pop.appendChild(clr);
+      }
+    });
+  }
+
+  function openColorPicker(t, anchor){
+    openPop(anchor, pop=>{
+      pop.classList.add('pop-color');
+      const row=document.createElement('div'); row.className="color-row";
+      COLOR_ORDER.forEach(name=>{
+        const b=document.createElement('button');
+        b.className="swatch"+((t.color||'slate')===name?" sel":"");
+        b.style.background=COLORS[name].dot; b.title=name;
+        b.onclick=()=>{ t.color=name; closePop(); render(); };
+        row.appendChild(b);
+      });
+      pop.appendChild(row);
+    });
+  }
+
+  function openAttrPopover(t, anchor){
+    openPop(anchor, pop=>{
+      pop.classList.add('pop-attr');
+      const h1=document.createElement('div'); h1.className="pop-h"; h1.textContent="Statut";
+      pop.appendChild(h1);
+      const sr=document.createElement('div'); sr.className="status-row";
+      STATUS_ORDER.forEach(k=>{
+        const b=document.createElement('button');
+        b.className="status-opt"+(t.status===k?" sel":"");
+        b.innerHTML=`<i style="background:${STATUS[k].dot}"></i>${STATUS[k].label}`;
+        b.onclick=()=>{ t.status = (t.status===k? undefined : k);
+          if(!t.status) delete t.status; closePop(); render(); };
+        sr.appendChild(b);
+      });
+      pop.appendChild(sr);
+
+      const h2=document.createElement('div'); h2.className="pop-h"; h2.textContent="Échéance";
+      pop.appendChild(h2);
+      const dwrap=document.createElement('div'); dwrap.className="date-row";
+      const di=document.createElement('input'); di.type="date"; di.className="date-input";
+      if(t.due) di.value=t.due;
+      di.onchange=()=>{ t.due=di.value||undefined; if(!t.due) delete t.due; save(); render(); };
+      dwrap.appendChild(di);
+      if(t.due){
+        const x=document.createElement('button'); x.className="date-clear"; x.textContent="×";
+        x.title="Retirer la date";
+        x.onclick=()=>{ delete t.due; closePop(); render(); };
+        dwrap.appendChild(x);
+      }
+      pop.appendChild(dwrap);
+    });
+  }
+
+  // ---------- drag reorder (within current level) ----------
+  let dragId=null;
+  function setupDrag(handle, li, t, parent, i){
+    handle.ondragstart=(e)=>{ dragId=t.id; e.dataTransfer.effectAllowed="move"; li.style.opacity=".4"; };
+    handle.ondragend=()=>{ dragId=null; li.style.opacity="1"; };
+    li.ondragover=(e)=>{ if(dragId&&dragId!==t.id){ e.preventDefault(); li.classList.add('dragover'); } };
+    li.ondragleave=()=>li.classList.remove('dragover');
+    li.ondrop=(e)=>{
+      e.preventDefault(); li.classList.remove('dragover');
+      if(!dragId||dragId===t.id) return;
+      const arr=parent.children;
+      const from=arr.findIndex(c=>c.id===dragId);
+      const to=arr.findIndex(c=>c.id===t.id);
+      if(from<0||to<0) return;
+      const [m]=arr.splice(from,1); arr.splice(to,0,m); render();
+    };
+  }
+
+  // ---------- composer ----------
+  const $composer=document.getElementById('composer');
+  $composer.addEventListener('keydown',(e)=>{
+    if(e.key==="Enter"){
+      const v=$composer.value.trim();
+      if(v){ addTop(v); $composer.value=""; }
+    }
+    if(e.key==="Escape") $composer.blur();
+  });
+
+  // ---------- export / import ----------
+  document.getElementById('export').onclick=()=>{
+    const blob=new Blob([JSON.stringify(root,null,2)],{type:"application/json"});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download="tiroir-"+new Date().toISOString().slice(0,10)+".json";
+    a.click();
+  };
+  document.getElementById('import').onclick=()=>{
+    const inp=document.createElement('input'); inp.type="file"; inp.accept=".json";
+    inp.onchange=()=>{
+      const f=inp.files[0]; if(!f) return;
+      const r=new FileReader();
+      r.onload=()=>{ try{ root=JSON.parse(r.result); path=[root.id]; render(); }
+        catch(err){ alert("Fichier illisible."); } };
+      r.readAsText(f);
+    };
+    inp.click();
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
