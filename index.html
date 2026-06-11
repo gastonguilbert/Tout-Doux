@@ -1082,10 +1082,21 @@
 
     const r=rowEl2.getBoundingClientRect();
     const rel=(e.clientY-r.top)/r.height;     // 0 (top) .. 1 (bottom)
+
+    // Horizontal intent: dragging to the RIGHT of the row's text means "nest inside".
+    // This is the natural outliner gesture (indent = make it a sub-task).
+    const txt=rowEl2.querySelector('.text');
+    const textLeft = txt ? txt.getBoundingClientRect().left : r.left+60;
+    const indentThreshold = textLeft + 26;    // px to the right before it counts as "inside"
+
     let mode;
-    if(rel<0.28) mode='before';
-    else if(rel>0.72) mode='after';
-    else mode='inside';                        // middle zone → nest as child
+    if(e.clientX > indentThreshold){
+      mode='inside';                          // shifted right → become a sub-task
+    } else if(rel<0.5){
+      mode='before';
+    } else {
+      mode='after';
+    }
 
     drag.target=dstId; drag.mode=mode;
     paintDropMark(rowEl2, mode);
