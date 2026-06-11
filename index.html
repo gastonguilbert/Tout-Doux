@@ -212,6 +212,32 @@
   .empty{
     text-align:center;padding:38px 20px 30px;color:var(--ink-faint);
   }
+  /* ---- drag & drop visuals ---- */
+  .drag-ghost{
+    position:fixed;z-index:100;pointer-events:none;
+    background:#2a261b;color:var(--ink);
+    border:1px solid var(--amber);border-radius:9px;
+    padding:8px 12px;font-size:14px;max-width:320px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    box-shadow:0 10px 30px -6px rgba(0,0,0,.7);
+    transform:translateZ(0);
+  }
+  body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
+  .drag-src{opacity:.4}
+  /* drop indicators: a line before/after, a highlight box for "inside" */
+  [data-row-id]{position:relative}
+  .drop-before::after,.drop-after::after{
+    content:"";position:absolute;left:0;right:8px;height:2px;
+    background:var(--amber);border-radius:2px;z-index:5;
+  }
+  .drop-before::after{top:-1px}
+  .drop-after::after{bottom:-1px}
+  .drop-inside{
+    box-shadow:inset 0 0 0 2px var(--amber);border-radius:9px;
+    background:var(--amber-soft);
+  }
+  /* let touch drags work: allow vertical scroll normally, JS handles the long-press */
+  .task,.node-row{touch-action:pan-y}
   .empty .glyph{font-family:'Fraunces';font-size:46px;color:var(--line);margin-bottom:10px}
   .empty p{font-size:14px;max-width:340px;margin:0 auto;line-height:1.6}
   .empty em{font-style:italic;color:var(--ink-dim)}
@@ -414,6 +440,7 @@
   const uid = () => Math.random().toString(36).slice(2,9);
 
   // Tree: { id, text, done, children:[] }. Virtual root holds everything.
+  const isFresh = !localStorage.getItem(STORE);  // true on a brand-new device
   let root = load();
   let path = [root.id];            // ids from root → current focus
   let nodes = new Map();           // id -> node, rebuilt on render
@@ -425,17 +452,33 @@
       if(raw) return JSON.parse(raw);
     }catch(e){}
     return { id:"root", text:"Tout doux", done:false, children:[
+      { id:uid(), text:"Bienvenue dans Tout doux 👋", done:false, emoji:"👋", color:"amber", children:[
+        { id:uid(), text:"Touche la flèche d’un bloc pour le déplier", done:false, children:[] },
+        { id:uid(), text:"Le rond à gauche coche une tâche comme terminée", done:false, children:[] },
+        { id:uid(), text:"Appuie longuement sur une tâche pour la glisser ailleurs", done:false, children:[] },
+        { id:uid(), text:"Le menu “…” permet d’ajouter un statut, une date, un emoji ou une couleur", done:false, children:[] }
+      ]},
+      { id:uid(), text:"Ranger la maison", done:false, emoji:"🏠", color:"blue", children:[
+        { id:uid(), text:"Cuisine", done:false, children:[
+          { id:uid(), text:"Faire la vaisselle", done:false, children:[] },
+          { id:uid(), text:"Nettoyer le plan de travail", done:false, children:[] },
+          { id:uid(), text:"Vider la poubelle", done:false, children:[] }
+        ]},
+        { id:uid(), text:"Chambre", done:false, children:[
+          { id:uid(), text:"Changer les draps", done:false, children:[] },
+          { id:uid(), text:"Ranger l’armoire", done:false, children:[] }
+        ]},
+        { id:uid(), text:"Salle de bain", done:false, children:[
+          { id:uid(), text:"Nettoyer le lavabo", done:false, children:[] },
+          { id:uid(), text:"Laver le miroir", done:false, children:[] }
+        ]}
+      ]},
       { id:uid(), text:"Liste de courses", done:false, emoji:"🛒", color:"green", children:[
         { id:uid(), text:"Légumes", done:false, children:[
           { id:uid(), text:"Tomates", done:false, children:[] },
           { id:uid(), text:"Courgettes", done:false, children:[] }
         ]},
         { id:uid(), text:"Pain", done:false, children:[] }
-      ]},
-      { id:uid(), text:"Projet vidéo", done:false, emoji:"🎬", color:"blue", status:"doing", children:[
-        { id:uid(), text:"Dérush", done:true, children:[] },
-        { id:uid(), text:"Montage", done:false, status:"doing", children:[] },
-        { id:uid(), text:"Étalonnage", done:false, status:"todo", children:[] }
       ]}
     ]};
   }
@@ -597,11 +640,12 @@
   function rowEl(t, parent, i, depth, extraActs){
     const row=document.createElement('div');
     row.className=(depth===0?"task":"node-row")+(t.done?" done":"");
+    row.dataset.rowId=t.id;
 
     // drag handle
     const handle=document.createElement('div');
-    handle.className="handle"; handle.textContent="⠿"; handle.draggable=true;
-    setupDrag(handle, row, t, parent, i);
+    handle.className="handle"; handle.textContent="⠿";
+    setupDrag(handle, row, t);
 
     // twirl (expand) — only meaningful if it has children
     const twirl=document.createElement('button');
@@ -799,6 +843,62 @@
     render();
   }
 
+  // ---- tree helpers for free-form move ----
+  function findParentOf(id, node){
+    for(const c of node.children){
+      if(c.id===id) return node;
+      const r=findParentOf(id, c);
+      if(r) return r;
+    }
+    return null;
+  }
+  function isDescendant(ancestorId, maybeChildId){
+    // true if maybeChildId is inside the subtree of ancestorId
+    const a=nodes.get(ancestorId);
+    if(!a) return false;
+    const walk=(n)=>{
+      for(const c of n.children){
+        if(c.id===maybeChildId) return true;
+        if(walk(c)) return true;
+      }
+      return false;
+    };
+    return walk(a);
+  }
+  // Move node `srcId` to a position relative to `dstId`.
+  // mode: 'before' | 'after' (sibling of dst) | 'inside' (first child of dst)
+  function moveNode(srcId, dstId, mode){
+    if(srcId===dstId) return false;
+    // can't drop a node into itself or its own descendants
+    if(mode==='inside' && (srcId===dstId || isDescendant(srcId, dstId))) return false;
+    if((mode==='before'||mode==='after') && isDescendant(srcId, dstId)) return false;
+
+    const src=nodes.get(srcId), dst=nodes.get(dstId);
+    if(!src||!dst) return false;
+    const srcParent=findParentOf(srcId, root);
+    if(!srcParent) return false;
+
+    // detach
+    srcParent.children=srcParent.children.filter(c=>c.id!==srcId);
+
+    if(mode==='inside'){
+      dst.children.unshift(src);
+      closedPreviews.delete(dst.id); // reveal so the moved task is visible
+    } else {
+      const dstParent=findParentOf(dstId, root);
+      if(!dstParent){ // dst is a top-level card; reattach src at root level
+        const arr=root.children;
+        const idx=arr.findIndex(c=>c.id===dstId);
+        arr.splice(mode==='after'?idx+1:idx, 0, src);
+      } else {
+        const arr=dstParent.children;
+        const idx=arr.findIndex(c=>c.id===dstId);
+        arr.splice(mode==='after'?idx+1:idx, 0, src);
+      }
+    }
+    return true;
+  }
+
   // ---------- popover system ----------
   let activePop=null;
   function closePop(){ if(activePop){ activePop.remove(); activePop=null;
@@ -903,22 +1003,114 @@
     });
   }
 
-  // ---------- drag reorder (within current level) ----------
-  let dragId=null;
-  function setupDrag(handle, li, t, parent, i){
-    handle.ondragstart=(e)=>{ dragId=t.id; e.dataTransfer.effectAllowed="move"; li.style.opacity=".4"; };
-    handle.ondragend=()=>{ dragId=null; li.style.opacity="1"; };
-    li.ondragover=(e)=>{ if(dragId&&dragId!==t.id){ e.preventDefault(); li.classList.add('dragover'); } };
-    li.ondragleave=()=>li.classList.remove('dragover');
-    li.ondrop=(e)=>{
-      e.preventDefault(); li.classList.remove('dragover');
-      if(!dragId||dragId===t.id) return;
-      const arr=parent.children;
-      const from=arr.findIndex(c=>c.id===dragId);
-      const to=arr.findIndex(c=>c.id===t.id);
-      if(from<0||to<0) return;
-      const [m]=arr.splice(from,1); arr.splice(to,0,m); render();
+  // ---------- drag & drop (pointer-based: works with mouse AND touch) ----------
+  // Move anywhere: reorder among siblings, nest inside another task, or move across blocks.
+  let drag=null;  // {srcId, ghost, pointerId, target, mode}
+
+  function setupDrag(handle, row, t){
+    // Desktop: press on the handle starts the drag immediately.
+    // Mobile: a long-press anywhere on the row starts it (handle is hidden on touch).
+    handle.addEventListener('pointerdown', e=>{ if(e.button===0||e.pointerType!=='mouse') startDrag(e, t, row); });
+
+    let lpTimer=null, lpStart=null;
+    row.addEventListener('pointerdown', e=>{
+      if(e.pointerType==='mouse') return;            // mouse uses the handle
+      if(e.target.closest('.act,.check,.twirl,.emoji-btn,.chip,.text[contenteditable]')) return;
+      lpStart={x:e.clientX,y:e.clientY,id:e.pointerId};
+      lpTimer=setTimeout(()=>{ navigator.vibrate&&navigator.vibrate(15); startDrag(e, t, row); }, 320);
+    });
+    const cancelLP=(e)=>{
+      if(lpTimer && lpStart){
+        // cancel if the finger moved too much before the long-press fired (it's a scroll)
+        if(e && lpStart && (Math.abs(e.clientX-lpStart.x)>8 || Math.abs(e.clientY-lpStart.y)>8)){
+          clearTimeout(lpTimer); lpTimer=null;
+        }
+      }
     };
+    row.addEventListener('pointermove', cancelLP);
+    row.addEventListener('pointerup', ()=>{ clearTimeout(lpTimer); lpTimer=null; });
+    row.addEventListener('pointercancel', ()=>{ clearTimeout(lpTimer); lpTimer=null; });
+  }
+
+  function startDrag(e, t, row){
+    if(drag) return;
+    e.preventDefault();
+    const rect=row.getBoundingClientRect();
+    const ghost=document.createElement('div');
+    ghost.className="drag-ghost";
+    ghost.textContent=(t.emoji?t.emoji+" ":"")+(t.text||"(sans titre)");
+    ghost.style.width=Math.min(rect.width,320)+"px";
+    document.body.appendChild(ghost);
+
+    drag={srcId:t.id, ghost, pointerId:e.pointerId, target:null, mode:null,
+          offX:e.clientX, offY:e.clientY};
+    moveGhost(e.clientX, e.clientY);
+    document.body.classList.add('dragging');
+    row.classList.add('drag-src');
+
+    window.addEventListener('pointermove', onDragMove, {passive:false});
+    window.addEventListener('pointerup', onDragEnd, {once:true});
+    window.addEventListener('pointercancel', onDragEnd, {once:true});
+  }
+
+  function moveGhost(x,y){
+    if(!drag) return;
+    drag.ghost.style.left=(x+12)+"px";
+    drag.ghost.style.top=(y+12)+"px";
+  }
+
+  function onDragMove(e){
+    if(!drag) return;
+    e.preventDefault();
+    moveGhost(e.clientX, e.clientY);
+
+    // auto-scroll near top/bottom edges
+    const margin=70;
+    if(e.clientY<margin) window.scrollBy(0,-12);
+    else if(e.clientY>innerHeight-margin) window.scrollBy(0,12);
+
+    // hide ghost momentarily to read the element underneath
+    drag.ghost.style.display='none';
+    const el=document.elementFromPoint(e.clientX, e.clientY);
+    drag.ghost.style.display='';
+
+    clearDropMarks();
+    const rowEl2 = el && el.closest('[data-row-id]');
+    if(!rowEl2){ drag.target=null; drag.mode=null; return; }
+    const dstId=rowEl2.dataset.rowId;
+    if(dstId===drag.srcId || isDescendant(drag.srcId, dstId)){ drag.target=null; drag.mode=null; return; }
+
+    const r=rowEl2.getBoundingClientRect();
+    const rel=(e.clientY-r.top)/r.height;     // 0 (top) .. 1 (bottom)
+    let mode;
+    if(rel<0.28) mode='before';
+    else if(rel>0.72) mode='after';
+    else mode='inside';                        // middle zone → nest as child
+
+    drag.target=dstId; drag.mode=mode;
+    paintDropMark(rowEl2, mode);
+  }
+
+  function paintDropMark(rowEl2, mode){
+    rowEl2.classList.add('drop-'+mode);
+  }
+  function clearDropMarks(){
+    document.querySelectorAll('.drop-before,.drop-after,.drop-inside')
+      .forEach(n=>n.classList.remove('drop-before','drop-after','drop-inside'));
+  }
+
+  function onDragEnd(){
+    if(!drag) return;
+    window.removeEventListener('pointermove', onDragMove);
+    const {srcId,target,mode,ghost}=drag;
+    ghost.remove();
+    document.body.classList.remove('dragging');
+    clearDropMarks();
+    const srcRow=document.querySelector('.drag-src'); if(srcRow) srcRow.classList.remove('drag-src');
+    drag=null;
+    if(target && mode){
+      if(moveNode(srcId, target, mode)){ render(); }
+    }
   }
 
   // ---------- composer ----------
@@ -944,13 +1136,28 @@
     inp.onchange=()=>{
       const f=inp.files[0]; if(!f) return;
       const r=new FileReader();
-      r.onload=()=>{ try{ root=JSON.parse(r.result); path=[root.id]; render(); }
+      r.onload=()=>{ try{ root=JSON.parse(r.result); path=[root.id]; collapseAll(); render(); }
         catch(err){ alert("Fichier illisible."); } };
       r.readAsText(f);
     };
     inp.click();
   };
 
+  // Collapse every node that has children. Called once on page load so a
+  // cold start always opens calm (everything folded). In-session toggles are
+  // kept in memory and survive app-switching (the page isn't reloaded then).
+  function collapseAll(){
+    closedPreviews=new Set();
+    const walk=(n)=>{ if(n.children.length) { if(n!==root) closedPreviews.add(n.id); n.children.forEach(walk); } };
+    walk(root);
+  }
+
+  collapseAll();
+  // On a brand-new device, gently reveal the first two demo blocks (one level)
+  // so newcomers immediately see how the room → tasks hierarchy works.
+  if(isFresh){
+    root.children.slice(0,2).forEach(b=> closedPreviews.delete(b.id));
+  }
   render();
 })();
 </script>
