@@ -238,6 +238,9 @@
   }
   /* let touch drags work: allow vertical scroll normally, JS handles the long-press */
   .task,.node-row{touch-action:pan-y}
+  /* while dragging, freeze native touch gestures so the page doesn't scroll away */
+  html.dragging-lock,html.dragging-lock body{touch-action:none}
+  html.dragging-lock .task,html.dragging-lock .node-row{touch-action:none}
   .empty .glyph{font-family:'Fraunces';font-size:46px;color:var(--line);margin-bottom:10px}
   .empty p{font-size:14px;max-width:340px;margin:0 auto;line-height:1.6}
   .empty em{font-style:italic;color:var(--ink-dim)}
@@ -438,6 +441,9 @@
   "use strict";
   const STORE = "tiroir.v1";
   const uid = () => Math.random().toString(36).slice(2,9);
+  // YYYY-MM-DD for n days from today — used only for the first-run demo content.
+  const demoDate = (n)=>{ const d=new Date(); d.setDate(d.getDate()+n);
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
 
   // Tree: { id, text, done, children:[] }. Virtual root holds everything.
   const isFresh = !localStorage.getItem(STORE);  // true on a brand-new device
@@ -460,17 +466,18 @@
       ]},
       { id:uid(), text:"Ranger la maison", done:false, emoji:"🏠", color:"blue", children:[
         { id:uid(), text:"Cuisine", done:false, children:[
-          { id:uid(), text:"Faire la vaisselle", done:false, children:[] },
-          { id:uid(), text:"Nettoyer le plan de travail", done:false, children:[] },
-          { id:uid(), text:"Vider la poubelle", done:false, children:[] }
+          { id:uid(), text:"Faire la vaisselle", done:false, status:"urgent", children:[] },
+          { id:uid(), text:"Nettoyer le plan de travail", done:false, status:"doing", children:[] },
+          { id:uid(), text:"Vider la poubelle", done:true, status:"done", children:[] },
+          { id:uid(), text:"Commander des éponges", done:false, status:"waiting", due:demoDate(2), children:[] }
         ]},
         { id:uid(), text:"Chambre", done:false, children:[
-          { id:uid(), text:"Changer les draps", done:false, children:[] },
-          { id:uid(), text:"Ranger l’armoire", done:false, children:[] }
+          { id:uid(), text:"Changer les draps", done:false, status:"todo", due:demoDate(1), children:[] },
+          { id:uid(), text:"Ranger l’armoire", done:false, status:"doing", children:[] }
         ]},
         { id:uid(), text:"Salle de bain", done:false, children:[
-          { id:uid(), text:"Nettoyer le lavabo", done:false, children:[] },
-          { id:uid(), text:"Laver le miroir", done:false, children:[] }
+          { id:uid(), text:"Nettoyer le lavabo", done:false, status:"todo", children:[] },
+          { id:uid(), text:"Laver le miroir", done:false, status:"urgent", due:demoDate(0), children:[] }
         ]}
       ]},
       { id:uid(), text:"Liste de courses", done:false, emoji:"🛒", color:"green", children:[
@@ -1009,32 +1016,42 @@
 
   function setupDrag(handle, row, t){
     // Desktop: press on the handle starts the drag immediately.
-    // Mobile: a long-press anywhere on the row starts it (handle is hidden on touch).
-    handle.addEventListener('pointerdown', e=>{ if(e.button===0||e.pointerType!=='mouse') startDrag(e, t, row); });
+    handle.addEventListener('pointerdown', e=>{ if(e.pointerType==='mouse' && e.button===0) startDrag(e, t, row); });
 
-    let lpTimer=null, lpStart=null;
+    // Mobile: long-press anywhere on the row (except interactive controls) starts it.
+    let lpTimer=null, lpStart=null, armed=false;
     row.addEventListener('pointerdown', e=>{
-      if(e.pointerType==='mouse') return;            // mouse uses the handle
-      if(e.target.closest('.act,.check,.twirl,.emoji-btn,.chip,.text[contenteditable]')) return;
-      lpStart={x:e.clientX,y:e.clientY,id:e.pointerId};
-      lpTimer=setTimeout(()=>{ navigator.vibrate&&navigator.vibrate(15); startDrag(e, t, row); }, 320);
+      if(e.pointerType==='mouse') return;
+      if(e.target.closest('.act,.check,.twirl,.emoji-btn,.chip')) return;
+      if(e.target.closest('.text') && e.target.closest('.text').isContentEditable) {
+        // allow tapping to edit, but still arm long-press for dragging
+      }
+      lpStart={x:e.clientX,y:e.clientY}; armed=true;
+      clearTimeout(lpTimer);
+      lpTimer=setTimeout(()=>{
+        if(!armed) return;
+        navigator.vibrate&&navigator.vibrate(18);
+        startDrag(e, t, row);
+      }, 280);
     });
-    const cancelLP=(e)=>{
-      if(lpTimer && lpStart){
-        // cancel if the finger moved too much before the long-press fired (it's a scroll)
-        if(e && lpStart && (Math.abs(e.clientX-lpStart.x)>8 || Math.abs(e.clientY-lpStart.y)>8)){
-          clearTimeout(lpTimer); lpTimer=null;
-        }
+    const onMove=(e)=>{
+      if(!armed || !lpStart) return;
+      // generous tolerance: only cancel if the finger clearly travels (a real scroll)
+      if(Math.abs(e.clientX-lpStart.x)>14 || Math.abs(e.clientY-lpStart.y)>14){
+        clearTimeout(lpTimer); lpTimer=null; armed=false;
       }
     };
-    row.addEventListener('pointermove', cancelLP);
-    row.addEventListener('pointerup', ()=>{ clearTimeout(lpTimer); lpTimer=null; });
-    row.addEventListener('pointercancel', ()=>{ clearTimeout(lpTimer); lpTimer=null; });
+    const clear=()=>{ clearTimeout(lpTimer); lpTimer=null; armed=false; };
+    row.addEventListener('pointermove', onMove, {passive:true});
+    row.addEventListener('pointerup', clear);
+    row.addEventListener('pointercancel', clear);
   }
+
+  function blockTouchScroll(e){ if(drag) e.preventDefault(); }
 
   function startDrag(e, t, row){
     if(drag) return;
-    e.preventDefault();
+    if(e.cancelable) e.preventDefault();
     const rect=row.getBoundingClientRect();
     const ghost=document.createElement('div');
     ghost.className="drag-ghost";
@@ -1042,12 +1059,14 @@
     ghost.style.width=Math.min(rect.width,320)+"px";
     document.body.appendChild(ghost);
 
-    drag={srcId:t.id, ghost, pointerId:e.pointerId, target:null, mode:null,
-          offX:e.clientX, offY:e.clientY};
+    drag={srcId:t.id, ghost, pointerId:e.pointerId, target:null, mode:null, row};
     moveGhost(e.clientX, e.clientY);
     document.body.classList.add('dragging');
+    document.documentElement.classList.add('dragging-lock'); // touch-action:none on everything
     row.classList.add('drag-src');
 
+    // stop iOS from scrolling the page while we drag
+    window.addEventListener('touchmove', blockTouchScroll, {passive:false});
     window.addEventListener('pointermove', onDragMove, {passive:false});
     window.addEventListener('pointerup', onDragEnd, {once:true});
     window.addEventListener('pointercancel', onDragEnd, {once:true});
@@ -1113,9 +1132,11 @@
   function onDragEnd(){
     if(!drag) return;
     window.removeEventListener('pointermove', onDragMove);
+    window.removeEventListener('touchmove', blockTouchScroll);
     const {srcId,target,mode,ghost}=drag;
     ghost.remove();
     document.body.classList.remove('dragging');
+    document.documentElement.classList.remove('dragging-lock');
     clearDropMarks();
     const srcRow=document.querySelector('.drag-src'); if(srcRow) srcRow.classList.remove('drag-src');
     drag=null;
@@ -1168,6 +1189,9 @@
   // so newcomers immediately see how the room → tasks hierarchy works.
   if(isFresh){
     root.children.slice(0,2).forEach(b=> closedPreviews.delete(b.id));
+    // also reveal the first room (Cuisine) so its status & due-date chips are visible
+    const maison=root.children[1];
+    if(maison && maison.children[0]) closedPreviews.delete(maison.children[0].id);
   }
   render();
 })();
