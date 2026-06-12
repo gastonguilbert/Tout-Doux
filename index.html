@@ -388,9 +388,18 @@
     .card.has-emoji > .task{padding-left:42px}
     .card.has-emoji > .subtree{padding-left:22px!important}
 
-    .handle{display:none}
-    .task{gap:9px;padding:10px 10px}
-    .node-row{gap:8px;padding-top:7px;padding-bottom:7px}
+    /* On touch, show a real grip as the drag target (no fragile long-press on text). */
+    .handle{
+      display:grid;opacity:.65;width:30px;align-self:stretch;
+      margin:-10px 0 -10px -4px;font-size:17px;position:relative;
+      color:var(--ink-dim);
+      touch-action:none;                  /* this zone never scrolls — it drags */
+      -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+    }
+    .handle::after{content:"";position:absolute;inset:-8px -4px;}  /* bigger tap area */
+    .handle:active{opacity:1;color:var(--amber)}
+    .task{gap:7px;padding:10px 10px}
+    .node-row{gap:6px;padding-top:7px;padding-bottom:7px}
 
     /* badge: progress only; level pill + colour dot hidden to save width */
     .card > .task{padding-right:104px;padding-bottom:10px;min-height:0}
@@ -1015,36 +1024,16 @@
   let drag=null;  // {srcId, ghost, pointerId, target, mode}
 
   function setupDrag(handle, row, t){
-    // Desktop: press on the handle starts the drag immediately.
-    handle.addEventListener('pointerdown', e=>{ if(e.pointerType==='mouse' && e.button===0) startDrag(e, t, row); });
-
-    // Mobile: long-press anywhere on the row (except interactive controls) starts it.
-    let lpTimer=null, lpStart=null, armed=false;
-    row.addEventListener('pointerdown', e=>{
-      if(e.pointerType==='mouse') return;
-      if(e.target.closest('.act,.check,.twirl,.emoji-btn,.chip')) return;
-      if(e.target.closest('.text') && e.target.closest('.text').isContentEditable) {
-        // allow tapping to edit, but still arm long-press for dragging
-      }
-      lpStart={x:e.clientX,y:e.clientY}; armed=true;
-      clearTimeout(lpTimer);
-      lpTimer=setTimeout(()=>{
-        if(!armed) return;
-        navigator.vibrate&&navigator.vibrate(18);
-        startDrag(e, t, row);
-      }, 280);
+    // Dragging is triggered ONLY from the dedicated handle (the ⠿ grip).
+    // This avoids any conflict with tapping the row to edit its text.
+    handle.addEventListener('pointerdown', e=>{
+      if(e.pointerType==='mouse' && e.button!==0) return;
+      e.preventDefault();          // stop the tap from focusing/scrolling
+      e.stopPropagation();
+      startDrag(e, t, row);
     });
-    const onMove=(e)=>{
-      if(!armed || !lpStart) return;
-      // generous tolerance: only cancel if the finger clearly travels (a real scroll)
-      if(Math.abs(e.clientX-lpStart.x)>14 || Math.abs(e.clientY-lpStart.y)>14){
-        clearTimeout(lpTimer); lpTimer=null; armed=false;
-      }
-    };
-    const clear=()=>{ clearTimeout(lpTimer); lpTimer=null; armed=false; };
-    row.addEventListener('pointermove', onMove, {passive:true});
-    row.addEventListener('pointerup', clear);
-    row.addEventListener('pointercancel', clear);
+    // prevent the native long-press callout / text selection on the handle (iOS)
+    handle.addEventListener('contextmenu', e=>e.preventDefault());
   }
 
   function blockTouchScroll(e){ if(drag) e.preventDefault(); }
