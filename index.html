@@ -417,9 +417,10 @@
     .check{width:22px;height:22px}
     .node .check{width:20px;height:20px}
 
-    /* iOS zooms in when focusing any editable field under 16px.
-       Force 16px on every editable text (incl. sub-tasks) to stop it. */
-    .text,.node .text,.composer input,.date-input{font-size:16px !important}
+    /* Keep the elegant smaller sub-task size at rest. iOS only zooms based on
+       the font-size AT FOCUS, so bump to 16px only while editing — the visual
+       hierarchy is preserved and the page no longer shifts. */
+    .text:focus,.node .text:focus,.composer input:focus,.date-input:focus{font-size:16px !important}
   }
 
   /* Touch devices have no hover: reveal the overflow trigger permanently */
