@@ -416,14 +416,16 @@
     .twirl{width:24px;height:24px}
     .check{width:22px;height:22px}
     .node .check{width:20px;height:20px}
+
+    /* iOS zooms in when focusing any editable field under 16px.
+       Force 16px on every editable text (incl. sub-tasks) to stop it. */
+    .text,.node .text,.composer input,.date-input{font-size:16px !important}
   }
 
   /* Touch devices have no hover: reveal the overflow trigger permanently */
   @media (hover:none){
     .act.more{opacity:.75}
     .emoji-btn.empty{opacity:.5}
-    /* iOS zooms when you focus a field under 16px — keep all editable text at 16px */
-    .text,.node .text,.composer input,.date-input{font-size:16px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
