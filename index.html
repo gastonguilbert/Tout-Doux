@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,6 +30,8 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
+  html,body{max-width:100%;overflow-x:hidden}
+  *{-webkit-text-size-adjust:100%;text-size-adjust:100%}  /* iOS: don't auto-resize text */
   body{
     background:
       radial-gradient(1200px 600px at 70% -10%, #221e15 0%, transparent 60%),
@@ -420,6 +422,8 @@
   @media (hover:none){
     .act.more{opacity:.75}
     .emoji-btn.empty{opacity:.5}
+    /* iOS zooms when you focus a field under 16px — keep all editable text at 16px */
+    .text,.node .text,.composer input,.date-input{font-size:16px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
