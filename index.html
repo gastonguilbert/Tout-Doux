@@ -474,7 +474,7 @@
 
   <div class="footnote">
     <span>Tout doux · tout est enregistré sur cet appareil</span>
-    <span><a id="export">exporter</a> · <a id="import">importer</a></span>
+    <span><a id="popout" style="display:none">⧉ fenêtre flottante</a><span id="popsep" style="display:none"> · </span><a id="export">exporter</a> · <a id="import">importer</a></span>
   </div>
 </div>
 
@@ -1295,6 +1295,45 @@
     };
     inp.click();
   };
+
+  // ---------- floating window (Document Picture-in-Picture) ----------
+  // Pops the whole app into an always-on-top window (Chromium browsers: Arc,
+  // Chrome, Edge, recent Firefox). Hidden where unsupported (e.g. Safari).
+  (function setupPiP(){
+    const btn=document.getElementById('popout');
+    const sep=document.getElementById('popsep');
+    if(!('documentPictureInPicture' in window)) return;   // unsupported → stay hidden
+    btn.style.display=''; sep.style.display='';
+
+    let pipWin=null;
+    const wrap=document.querySelector('.wrap');
+
+    btn.onclick=async ()=>{
+      if(pipWin){ pipWin.close(); return; }
+      try{
+        pipWin=await documentPictureInPicture.requestWindow({width:380, height:600});
+      }catch(e){ return; }
+
+      // copy all styles into the PiP window
+      document.querySelectorAll('style, link[rel="stylesheet"]').forEach(node=>{
+        pipWin.document.head.appendChild(node.cloneNode(true));
+      });
+      // styles (incl. the body gradient) come from the cloned stylesheets above
+      pipWin.document.body.style.margin="0";
+      pipWin.document.documentElement.style.background="#16140f";
+
+      // move the live app element into the floating window
+      pipWin.document.body.appendChild(wrap);
+      btn.textContent="⧉ refermer la fenêtre";
+
+      pipWin.addEventListener('pagehide', ()=>{
+        // bring the app back into the main page
+        document.body.appendChild(wrap);
+        btn.textContent="⧉ fenêtre flottante";
+        pipWin=null;
+      });
+    };
+  })();
 
   // Collapse every node that has children. Called once on page load so a
   // cold start always opens calm (everything folded). In-session toggles are
