@@ -34,8 +34,10 @@
   *{-webkit-text-size-adjust:100%;text-size-adjust:100%}  /* iOS: don't auto-resize text */
   body{
     background:
-      radial-gradient(1200px 600px at 70% -10%, #221e15 0%, transparent 60%),
+      radial-gradient(900px 500px at 80% -5%, #241f15 0%, transparent 55%),
+      radial-gradient(700px 500px at 0% 100%, #1b1d22 0%, transparent 55%),
       var(--bg);
+    background-attachment:fixed;
     color:var(--ink);
     font-family:'Inter',system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
@@ -77,19 +79,56 @@
   /* ---- Task list ---- */
   ul.list{list-style:none;display:flex;flex-direction:column;gap:8px}
 
-  /* Each top-level task is a distinct card */
+  /* Each top-level task is a glass card tinted by its theme colour. */
   .card{
     position:relative;
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:14px;
-    box-shadow:0 1px 0 rgba(0,0,0,.25), 0 6px 18px -12px rgba(0,0,0,.6);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.012) 40px, transparent 90px),
+      var(--card-glass, rgba(40,40,46,.5));
+    -webkit-backdrop-filter:blur(18px) saturate(1.25);
+    backdrop-filter:blur(18px) saturate(1.25);
+    border:1px solid var(--card-edge, rgba(255,255,255,.10));
+    border-radius:18px;
+    box-shadow:0 8px 24px -14px rgba(0,0,0,.7);
     overflow:hidden;
-    transition:border-color .15s, box-shadow .15s;
+    transition:border-color .25s ease, box-shadow .3s ease, transform .18s ease,
+               backdrop-filter .25s ease;
   }
-  .card:hover{border-color:#3f3b27}
+  /* a crisp 1px light line along the very top edge — the glass rim (not a streak) */
+  .card::before{
+    content:"";position:absolute;left:12px;right:12px;top:0;height:1px;border-radius:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+    opacity:.6;z-index:2;pointer-events:none;
+  }
+  /* coloured glow that blooms behind the card when touched / open */
+  .card .glow{
+    content:"";position:absolute;inset:0;border-radius:inherit;
+    background:radial-gradient(140% 90% at 50% -10%, var(--card-dot) 0%, transparent 60%);
+    opacity:0;transition:opacity .35s ease;
+    pointer-events:none;z-index:0;mix-blend-mode:screen;
+  }
+  .card.lit .glow{opacity:.22}
+  .card.lit{
+    border-color:color-mix(in srgb, var(--card-dot) 45%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--card-dot) 22%, transparent),
+      0 12px 44px -18px color-mix(in srgb, var(--card-dot) 55%, transparent),
+      0 8px 24px -14px rgba(0,0,0,.7);
+  }
+  /* keep card content above the glow layer */
+  .card > *{position:relative;z-index:1}
+  /* hover / press: the glass simply thickens (more blur), no white band */
+  .card:hover{ border-color:color-mix(in srgb, var(--card-dot) 35%, rgba(255,255,255,.12)); }
+  .card.pressed,.card:hover{
+    -webkit-backdrop-filter:blur(26px) saturate(1.4) brightness(1.04);
+    backdrop-filter:blur(26px) saturate(1.4) brightness(1.04);
+  }
   .card.dragover{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
   .card.done{opacity:.62}
+
+  @supports not (backdrop-filter:blur(1px)){
+    .card{background:var(--card-glass-fallback, var(--panel))}
+  }
 
   .task{
     display:flex;align-items:flex-start;gap:10px;
@@ -147,13 +186,6 @@
   .act:hover{opacity:1;color:var(--ink);background:var(--line-soft)}
   .act.dive:hover{color:var(--amber)}
   .act.del:hover{color:#cf6a5a}
-  .handle{
-    flex:none;width:16px;align-self:stretch;cursor:grab;opacity:0;
-    color:var(--ink-faint);display:grid;place-items:center;font-size:13px;
-    transition:opacity .15s;margin:-2px -2px -2px -6px;
-  }
-  .task:hover .handle,.node-row:hover .handle{opacity:.45}
-  .handle:active{cursor:grabbing}
 
   /* ---- New task input ---- */
   .composer{
@@ -215,26 +247,26 @@
     text-align:center;padding:38px 20px 30px;color:var(--ink-faint);
   }
   /* ---- drag & drop visuals ---- */
-  .drag-ghost{
-    position:fixed;z-index:100;pointer-events:none;
-    background:#2a261b;color:var(--ink);
-    border:1px solid var(--amber);border-radius:9px;
-    padding:8px 12px;font-size:14px;max-width:320px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    box-shadow:0 10px 30px -6px rgba(0,0,0,.7);
-    transform:translateZ(0);
+  /* the lifted block follows the finger; raised look while dragging */
+  .lifting{
+    position:relative;z-index:90;
+    box-shadow:0 18px 40px -10px rgba(0,0,0,.75);
+    cursor:grabbing;
+    transition:box-shadow .15s ease;
   }
   body.dragging{cursor:grabbing;-webkit-user-select:none;user-select:none}
-  .drag-src{opacity:.4}
+  /* neighbours glide apart to make room (transform only — layout untouched) */
+  .pushing{transition:transform .16s ease}
+  [data-id]{transition:transform .16s ease}
   /* drop indicators: a line before/after, a highlight box for "inside" */
   [data-row-id]{position:relative}
-  /* Reorder between two items → a clean thin line (before/after). */
   .drop-before::after,.drop-after::after{
-    content:"";position:absolute;left:0;right:8px;height:2px;
-    background:var(--amber);border-radius:2px;z-index:5;
+    content:"";position:absolute;left:0;right:8px;height:3px;
+    background:var(--amber);border-radius:3px;z-index:5;
+    box-shadow:0 0 8px -1px var(--amber);
   }
-  .drop-before::after{top:-1px}
-  .drop-after::after{bottom:-1px}
+  .drop-before::after{top:-2px}
+  .drop-after::after{bottom:-2px}
   /* Nest INTO another task → a bold highlight box, clearly different from the line. */
   .drop-inside{
     box-shadow:inset 0 0 0 2px var(--amber), 0 0 0 1px var(--amber);
@@ -242,7 +274,6 @@
     background:linear-gradient(0deg, rgba(217,154,60,.18), rgba(217,154,60,.18)), var(--amber-soft);
   }
   .drop-inside > .node-row, .drop-inside > .task{ background:transparent; }
-  /* a little "→ sous-tâche" cue on the right while nesting */
   .drop-inside::after{
     content:"⤵ sous-tâche";position:absolute;right:10px;top:50%;
     transform:translateY(-50%);font-size:11px;color:var(--amber);
@@ -401,25 +432,14 @@
     .card.has-emoji > .task{padding-left:42px}
     .card.has-emoji > .subtree{padding-left:22px!important}
 
-    /* On touch, show a real grip as the drag target (no fragile long-press on text). */
-    /* Placed on the RIGHT so the right thumb can grab it without hiding the text. */
-    .handle{
-      display:grid;opacity:.6;width:30px;align-self:stretch;order:9;
-      margin:-10px -2px -10px 0;font-size:17px;position:relative;
-      color:var(--ink-dim);
-      touch-action:none;                  /* this zone never scrolls — it drags */
-      -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
-    }
-    .handle::after{content:"";position:absolute;inset:-10px -6px;}  /* bigger tap area */
-    .handle:active{opacity:1;color:var(--amber)}
-    /* keep the ⋯ menu just left of the grip on card headers */
-    .card > .task > .actions{position:absolute;top:8px;right:42px}
+    /* ⋯ menu pinned top-right of a card header */
+    .card > .task > .actions{position:absolute;top:8px;right:10px}
     .task{gap:7px;padding:10px 10px}
     .node-row{gap:6px;padding-top:7px;padding-bottom:7px}
 
-    /* right side order on a card header: [badge] [⋯] [grip] */
-    .card > .task{padding-right:120px;padding-bottom:10px;min-height:0}
-    .topright{top:12px;right:74px;gap:0}
+    /* right side of a card header: [badge] [⋯] — no grip to reserve anymore */
+    .card > .task{padding-right:96px;padding-bottom:10px;min-height:0}
+    .topright{top:12px;right:42px;gap:0}
     .b-lvl{display:none}
     .color-btn{display:none}
     .b-bar{width:28px}
@@ -534,6 +554,12 @@
   }
 
   // ---- card color palette (name -> accent + soft tint) ----
+  function hexToRgba(hex, a){
+    hex=hex.replace('#','');
+    if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+    const r=parseInt(hex.slice(0,2),16), g=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16);
+    return `rgba(${r},${g},${b},${a})`;
+  }
   const COLORS = {
     slate:  {dot:"#7d8aa0", tint:"#1d2330", line:"#2c3547"},
     blue:   {dot:"#4a78b0", tint:"#161f2e", line:"#243349"},
@@ -541,7 +567,7 @@
     amber:  {dot:"#d99a3c", tint:"#241c0f", line:"#3a2f15"},
     rose:   {dot:"#cf6a7a", tint:"#271317", line:"#3d2026"},
     violet: {dot:"#9b7bc4", tint:"#1f1830", line:"#2f2647"},
-    teal:   {dot:"#48a0a8", tint:"#10242630",line:"#1d3a3d"},
+    teal:   {dot:"#48a0a8", tint:"#102426", line:"#1d3a3d"},
   };
   const COLOR_ORDER = ["slate","blue","green","amber","rose","violet","teal"];
 
@@ -671,10 +697,8 @@
     row.className=(depth===0?"task":"node-row")+(t.done?" done":"");
     row.dataset.rowId=t.id;
 
-    // drag handle
-    const handle=document.createElement('div');
-    handle.className="handle"; handle.textContent="⠿";
-    setupDrag(handle, row, t);
+    // long-press anywhere on the row lifts it for dragging
+    setupDrag(null, row, t);
 
     // twirl (expand) — only meaningful if it has children
     const twirl=document.createElement('button');
@@ -759,7 +783,7 @@
     more.onclick=(e)=>{ e.stopPropagation(); openActionMenu(menuActs, more); };
     actions.appendChild(more);
 
-    row.append(handle,twirl,check,body,actions);
+    row.append(twirl,check,body,actions);
     return row;
   }
 
@@ -785,9 +809,11 @@
     const col=COLORS[t.color]||COLORS.slate;
     card.className="card"+(t.done?" done":"");
     card.dataset.id=t.id;
-    card.style.background=col.tint;
-    card.style.borderColor=col.line;
-    card.style.setProperty('--card-dot',col.dot);
+    // glass: a translucent tint of the theme colour over the blurred backdrop
+    card.style.setProperty('--card-dot', col.dot);
+    card.style.setProperty('--card-glass', hexToRgba(col.tint, 0.55));
+    card.style.setProperty('--card-glass-fallback', col.tint);
+    card.style.setProperty('--card-edge', hexToRgba(col.dot, 0.28));
 
     // Card-only extra actions, surfaced in the ⋯ menu (emoji + colour).
     const extraActs=[
@@ -830,17 +856,35 @@
     header.appendChild(topright);
 
     card.classList.add('has-emoji');
+    const glow=document.createElement('div'); glow.className="glow";
+    card.appendChild(glow);
     card.appendChild(emojiBtn);
     card.appendChild(header);
 
     if(t.children.length){
       const open=!closedPreviews.has(t.id);
+      if(open) card.classList.add('lit');     // glow when the block is open
       const sub=document.createElement('div');
       sub.className="subtree"+(open?"":" collapsed");
       sub.style.padding="0 12px 10px 28px";
       sub.style.marginLeft="0";
       t.children.forEach((c,j)=> sub.appendChild(nodeEl(c, t, j, 1)));
       card.appendChild(sub);
+    }
+
+    // brief glow pulse + glass thickening on touch/press
+    card.addEventListener('pointerdown', ()=>{
+      card.classList.add('lit','pressed');
+    });
+    const unpress=()=>{ card.classList.remove('pressed');
+      if(closedPreviews.has(t.id)) card.classList.remove('lit'); };
+    card.addEventListener('pointerup', unpress);
+    card.addEventListener('pointercancel', unpress);
+    if(!('ontouchstart' in window)){
+      card.addEventListener('pointerleave', ()=>{
+        card.classList.remove('pressed');
+        if(closedPreviews.has(t.id)) card.classList.remove('lit');
+      });
     }
     return card;
   }
@@ -1035,100 +1079,170 @@
     });
   }
 
-  // ---------- drag & drop (pointer-based: works with mouse AND touch) ----------
-  // Move anywhere: reorder among siblings, nest inside another task, or move across blocks.
-  let drag=null;  // {srcId, ghost, pointerId, target, mode}
+  // ---------- drag & drop (long-press lift; the row follows the finger) ----------
+  let drag=null;
 
   function setupDrag(handle, row, t){
-    // Dragging is triggered ONLY from the dedicated handle (the ⠿ grip).
-    // This avoids any conflict with tapping the row to edit its text.
-    handle.addEventListener('pointerdown', e=>{
-      if(e.pointerType==='mouse' && e.button!==0) return;
-      e.preventDefault();          // stop the tap from focusing/scrolling
-      e.stopPropagation();
-      startDrag(e, t, row);
+    const isControl=(target)=> !!(target.closest && target.closest('.act,.check,.twirl,.emoji-btn,.chip,.color-btn'));
+
+    row.addEventListener('pointerdown', e=>{
+      if(e.button && e.button!==0) return;
+      if(isControl(e.target)) return;
+      const start={x:e.clientX,y:e.clientY,e};
+      let timer=null, armed=true;
+
+      const onWinMove=(ev)=>{
+        if(!armed || drag) return;
+        const dx=Math.abs(ev.clientX-start.x), dy=Math.abs(ev.clientY-start.y);
+        if(e.pointerType==='mouse'){
+          if(dx>4||dy>4){ cleanup(); startDrag(start.e, t, row); }
+        } else {
+          if(dx>12||dy>12){ armed=false; cleanup(); }   // it's a scroll, cancel long-press
+        }
+      };
+      const onWinUp=()=>{ cleanup(); };
+      function cleanup(){
+        armed=false; clearTimeout(timer);
+        window.removeEventListener('pointermove', onWinMove);
+        window.removeEventListener('pointerup', onWinUp);
+        window.removeEventListener('pointercancel', onWinUp);
+      }
+      window.addEventListener('pointermove', onWinMove, {passive:true});
+      window.addEventListener('pointerup', onWinUp, {once:true});
+      window.addEventListener('pointercancel', onWinUp, {once:true});
+
+      if(e.pointerType!=='mouse'){
+        timer=setTimeout(()=>{
+          if(!armed) return;
+          cleanup();
+          navigator.vibrate&&navigator.vibrate(15);
+          startDrag(start.e, t, row);
+        }, 300);
+      }
     });
-    // prevent the native long-press callout / text selection on the handle (iOS)
-    handle.addEventListener('contextmenu', e=>e.preventDefault());
+    row.addEventListener('contextmenu', e=>{ if(drag) e.preventDefault(); });
   }
 
   function blockTouchScroll(e){ if(drag) e.preventDefault(); }
+  function outerBlock(row){
+    // For a card header, the movable block is the whole .card.
+    // For a nested row, it's the DIRECT .node (its immediate parent), not an
+    // ancestor .node that would wrap several sub-tasks.
+    if(row.classList.contains('task')) return row.closest('.card') || row;
+    if(row.parentElement && row.parentElement.classList.contains('node')) return row.parentElement;
+    return row.closest('.node') || row;
+  }
 
   function startDrag(e, t, row){
     if(drag) return;
     if(e.cancelable) e.preventDefault();
-    const rect=row.getBoundingClientRect();
-    const ghost=document.createElement('div');
-    ghost.className="drag-ghost";
-    ghost.textContent=(t.emoji?t.emoji+" ":"")+(t.text||"(sans titre)");
-    ghost.style.width=Math.min(rect.width,320)+"px";
-    document.body.appendChild(ghost);
+    const block=outerBlock(row);
+    const rect=block.getBoundingClientRect();
 
-    drag={srcId:t.id, ghost, pointerId:e.pointerId, target:null, mode:null, row};
-    moveGhost(e.clientX, e.clientY);
+    drag={
+      srcId:t.id, row, block,
+      pointerId:e.pointerId,
+      grabX:e.clientX, grabY:e.clientY,
+      originLeft:rect.left, originTop:rect.top,
+      target:null, mode:null, pushed:null
+    };
+
+    // lift the real block: it follows the finger via transform
+    block.classList.add('lifting');
+    block.style.width=rect.width+'px';
+    block.style.pointerEvents='none';     // so elementFromPoint reads beneath it
     document.body.classList.add('dragging');
-    document.documentElement.classList.add('dragging-lock'); // touch-action:none on everything
-    row.classList.add('drag-src');
+    document.documentElement.classList.add('dragging-lock');
+    moveLift(e.clientX, e.clientY);
 
-    // stop iOS from scrolling the page while we drag
     window.addEventListener('touchmove', blockTouchScroll, {passive:false});
     window.addEventListener('pointermove', onDragMove, {passive:false});
     window.addEventListener('pointerup', onDragEnd, {once:true});
     window.addEventListener('pointercancel', onDragEnd, {once:true});
   }
 
-  function moveGhost(x,y){
+  function moveLift(x,y){
     if(!drag) return;
-    drag.ghost.style.left=(x+12)+"px";
-    drag.ghost.style.top=(y+12)+"px";
+    const dx=x-drag.grabX, dy=y-drag.grabY;
+    drag.block.style.transform=`translate(${dx}px, ${dy}px) scale(1.02)`;
   }
 
   function onDragMove(e){
     if(!drag) return;
     e.preventDefault();
-    moveGhost(e.clientX, e.clientY);
+    moveLift(e.clientX, e.clientY);
 
-    // auto-scroll near top/bottom edges
-    const margin=70;
-    if(e.clientY<margin) window.scrollBy(0,-12);
-    else if(e.clientY>innerHeight-margin) window.scrollBy(0,12);
-
-    // hide ghost momentarily to read the element underneath
-    drag.ghost.style.display='none';
-    const el=document.elementFromPoint(e.clientX, e.clientY);
-    drag.ghost.style.display='';
+    const margin=80;
+    if(e.clientY<margin) window.scrollBy(0,-14);
+    else if(e.clientY>innerHeight-margin) window.scrollBy(0,14);
 
     clearDropMarks();
-    const rowEl2 = el && el.closest('[data-row-id]');
-    if(!rowEl2){ drag.target=null; drag.mode=null; return; }
-    const dstId=rowEl2.dataset.rowId;
+    clearPush();
+
+    // Geometric hit-test on the UNTRANSFORMED layout. We skip the lifted block
+    // and any of its descendants, and we ignore the lifted block's moved rect by
+    // testing every other row's own (static) rectangle against the pointer Y.
+    const rows=[...document.querySelectorAll('[data-row-id]')];
+    let best=null, bestDist=Infinity;
+    for(const rEl of rows){
+      const id=rEl.dataset.rowId;
+      if(id===drag.srcId) continue;                 // never target the dragged item
+      if(drag.block.contains(rEl)) continue;        // nor anything inside the lifted block
+      const rc=rEl.getBoundingClientRect();
+      if(rc.height===0) continue;
+      if(rc.bottom<-40 || rc.top>innerHeight+40) continue;
+      if(e.clientY>=rc.top && e.clientY<=rc.bottom){ best=rEl; bestDist=0; break; }
+      const d=Math.min(Math.abs(e.clientY-rc.top), Math.abs(e.clientY-rc.bottom));
+      if(d<bestDist){ bestDist=d; best=rEl; }
+    }
+    if(!best || bestDist>44){ drag.target=null; drag.mode=null; return; }
+    const dstId=best.dataset.rowId;
     if(dstId===drag.srcId || isDescendant(drag.srcId, dstId)){ drag.target=null; drag.mode=null; return; }
 
-    const r=rowEl2.getBoundingClientRect();
-    const rel=(e.clientY-r.top)/r.height;     // 0 (top) .. 1 (bottom)
-
-    // Horizontal intent: dragging to the RIGHT of the row's text means "nest inside".
-    // This is the natural outliner gesture (indent = make it a sub-task).
-    const txt=rowEl2.querySelector('.text');
+    const r=best.getBoundingClientRect();
+    const rel=(e.clientY-r.top)/r.height;          // 0 (top) .. 1 (bottom)
+    const txt=best.querySelector('.text');
     const textLeft = txt ? txt.getBoundingClientRect().left : r.left+60;
-    const indentThreshold = textLeft + 26;    // px to the right before it counts as "inside"
+    // "inside" needs a clear rightward push, well past the text start (not just 30px),
+    // so reordering between sibling sub-tasks stays easy to hit.
+    const deepRight = e.clientX > textLeft + 80;
 
     let mode;
-    if(e.clientX > indentThreshold){
-      mode='inside';                          // shifted right → become a sub-task
-    } else if(rel<0.5){
-      mode='before';
-    } else {
-      mode='after';
-    }
+    if(rel < 0.34) mode='before';                  // top third → place above
+    else if(rel > 0.66) mode='after';              // bottom third → place below
+    else mode = deepRight ? 'inside' : 'after';    // middle: nest only if pushed far right
 
     drag.target=dstId; drag.mode=mode;
-    paintDropMark(rowEl2, mode);
+    paintDropMark(best, mode);
+    pushNeighbors(best, mode);
   }
 
-  function paintDropMark(rowEl2, mode){
-    rowEl2.classList.add('drop-'+mode);
+  // Visually separate neighbours by translating them — no DOM change, so
+  // hit-testing stays reliable (this is what broke the previous attempt).
+  function pushNeighbors(rowEl2, mode){
+    if(mode==='inside') return;     // nesting shows a box, no separation needed
+    const block=outerBlock(rowEl2);
+    const amount=14;
+    if(mode==='before'){
+      block.style.transform=`translateY(${amount}px)`;
+      block.classList.add('pushing');
+      drag.pushed=[block];
+    } else {
+      // push the NEXT sibling block down (and this one stays)
+      let nb=block.nextElementSibling;
+      while(nb && !nb.matches('[data-id]')) nb=nb.nextElementSibling;
+      if(nb){ nb.style.transform=`translateY(${amount}px)`; nb.classList.add('pushing'); drag.pushed=[nb]; }
+      else { block.style.transform=`translateY(-${0}px)`; }
+    }
   }
+  function clearPush(){
+    if(drag && drag.pushed){
+      drag.pushed.forEach(n=>{ n.style.transform=''; n.classList.remove('pushing'); });
+      drag.pushed=null;
+    }
+  }
+
+  function paintDropMark(rowEl2, mode){ rowEl2.classList.add('drop-'+mode); }
   function clearDropMarks(){
     document.querySelectorAll('.drop-before,.drop-after,.drop-inside')
       .forEach(n=>n.classList.remove('drop-before','drop-after','drop-inside'));
@@ -1138,12 +1252,14 @@
     if(!drag) return;
     window.removeEventListener('pointermove', onDragMove);
     window.removeEventListener('touchmove', blockTouchScroll);
-    const {srcId,target,mode,ghost}=drag;
-    ghost.remove();
+    const {srcId,target,mode,block}=drag;
+    // reset the lifted block's inline styles
+    block.classList.remove('lifting');
+    block.style.transform=''; block.style.width=''; block.style.pointerEvents='';
+    clearPush();
+    clearDropMarks();
     document.body.classList.remove('dragging');
     document.documentElement.classList.remove('dragging-lock');
-    clearDropMarks();
-    const srcRow=document.querySelector('.drag-src'); if(srcRow) srcRow.classList.remove('drag-src');
     drag=null;
     if(target && mode){
       if(moveNode(srcId, target, mode)){ render(); }
