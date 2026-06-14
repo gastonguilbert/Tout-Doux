@@ -13,35 +13,86 @@
 <title>Tout doux — todo infinie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#16140f;
-    --panel:#1e1b14;
-    --line:#33301f;
-    --line-soft:#2a271c;
-    --ink:#ede6d4;
-    --ink-dim:#9b9379;
-    --ink-faint:#67614c;
-    --amber:#d99a3c;
-    --amber-soft:#3a2f15;
-    --done:#4a8c6f;
+    /* Aurora — deep violet-night with coloured aurora blooms */
+    --bg:#0b0a14;
+    --panel:rgba(255,255,255,.07);
+    --line:rgba(255,255,255,.13);
+    --line-soft:rgba(255,255,255,.07);
+    --ink:#f0eef4;
+    --ink-dim:#aab0c0;
+    --ink-faint:#6b7186;
+    --amber:#f0a93c;
+    --amber-soft:rgba(240,169,60,.16);
+    --done:#46b894;
     --radius:10px;
+    --chip-bg:rgba(255,255,255,.08);
+    --pop-bg:#181626;
+  }
+  /* light theme: cool daylight, same identity */
+  body.light{
+    --bg:#eceef5;
+    --panel:rgba(255,255,255,.55);
+    --line:rgba(40,50,80,.14);
+    --line-soft:rgba(40,50,80,.08);
+    --ink:#1c2430;
+    --ink-dim:#5a6678;
+    --ink-faint:#9aa3b6;
+    --amber:#c47d1a;
+    --amber-soft:rgba(196,125,26,.16);
+    --done:#2f8f6b;
+    --chip-bg:rgba(0,0,0,.05);
+    --pop-bg:#ffffff;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
+  html,body{height:100%;min-height:100%}
+  html{background:var(--bg)}
+  html.light{background:#eceef5}
   html,body{max-width:100%;overflow-x:hidden}
-  *{-webkit-text-size-adjust:100%;text-size-adjust:100%}  /* iOS: don't auto-resize text */
+  *{-webkit-text-size-adjust:100%;text-size-adjust:100%}
   body{
-    background:
-      radial-gradient(900px 500px at 80% -5%, #241f15 0%, transparent 55%),
-      radial-gradient(700px 500px at 0% 100%, #1b1d22 0%, transparent 55%),
-      var(--bg);
-    background-attachment:fixed;
+    background:var(--bg);
     color:var(--ink);
     font-family:'Inter',system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
     line-height:1.5;
+    transition:color .3s ease;
+  }
+  /* Animated aurora blooms on a fixed layer. Solid --bg underneath = no iOS
+     banding. Each bloom drifts slowly so the background gently "breathes". */
+  body::before, body::after{
+    content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;
+    filter:blur(46px);opacity:.5;will-change:transform;
+  }
+  body::before{
+    width:75vw;height:50vh;left:-15vw;top:-10vh;
+    background:radial-gradient(ellipse, #ff6fb0 0%, transparent 62%);
+    animation:aurora1 22s ease-in-out infinite alternate;
+  }
+  body::after{
+    width:80vw;height:55vh;right:-20vw;top:32%;
+    background:radial-gradient(ellipse, #4f8cff 0%, transparent 62%);
+    animation:aurora2 26s ease-in-out infinite alternate;
+  }
+  /* a third warm bloom at the bottom via a dedicated element */
+  .aurora3{
+    content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;
+    width:70vw;height:50vh;left:6vw;bottom:-20vh;filter:blur(46px);opacity:.22;
+    background:radial-gradient(ellipse, var(--amber) 0%, transparent 62%);
+    animation:aurora3 30s ease-in-out infinite alternate;will-change:transform;
+  }
+  /* dark theme: keep blooms subtle so the night stays dark and text readable */
+  body::before{opacity:.22} body::after{opacity:.24}
+  /* light theme: blooms can be a touch stronger on the pale base */
+  body.light::before{opacity:.32} body.light::after{opacity:.3}
+  body.light .aurora3{opacity:.28}
+  @keyframes aurora1{ from{transform:translate(0,0) scale(1)} to{transform:translate(8vw,6vh) scale(1.15)} }
+  @keyframes aurora2{ from{transform:translate(0,0) scale(1)} to{transform:translate(-10vw,-5vh) scale(1.1)} }
+  @keyframes aurora3{ from{transform:translate(0,0) scale(1)} to{transform:translate(6vw,-8vh) scale(1.2)} }
+  @media (prefers-reduced-motion:reduce){
+    body::before,body::after,.aurora3{animation:none}
   }
   .wrap{
     max-width:760px;margin:0 auto;
@@ -51,7 +102,7 @@
   }
 
   /* ---- Header / breadcrumb ---- */
-  header{margin-bottom:22px}
+  header{margin-bottom:30px}
   .crumbs{
     display:flex;align-items:center;flex-wrap:wrap;gap:2px;
     font-family:'Fraunces',serif;
@@ -65,70 +116,124 @@
   }
   .crumb:hover{color:var(--ink);background:var(--line-soft)}
   .crumb.current{
-    color:var(--ink);font-size:29px;font-weight:600;
-    padding:2px 0;cursor:default;letter-spacing:-.01em;
-    display:inline-flex;align-items:center;gap:10px;
+    color:var(--ink);font-family:'Instrument Serif',serif;font-style:italic;
+    font-size:42px;font-weight:400;
+    padding:2px 0;cursor:default;letter-spacing:.5px;line-height:1.05;
+    display:inline-flex;align-items:center;gap:12px;
   }
   .crumb.current:hover{background:none}
-  .logo{width:26px;height:26px;flex:none;display:block}
+  .logo{width:30px;height:30px;flex:none;display:block;
+    filter:drop-shadow(0 0 10px color-mix(in srgb, var(--amber) 50%, transparent))}
   .sep{color:var(--ink-faint);font-size:13px;user-select:none}
   .subtitle{color:var(--ink-faint);font-size:13px;margin-left:2px;
     display:flex;gap:10px;align-items:center}
   .subtitle:empty{display:none}
 
   /* ---- Task list ---- */
-  ul.list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  ul.list{list-style:none;display:flex;flex-direction:column;gap:12px}
 
-  /* Each top-level task is a glass card tinted by its theme colour. */
+  /* "À faire cette semaine" recap — deliberately NOT a glass card: a plain
+     outlined box so it reads as a summary, not another task block. */
+  .agenda{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 14px 12px;
+    margin-bottom:14px;
+    background:transparent;
+  }
+  .agenda h2{
+    font-family:'Inter',sans-serif;
+    font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--ink-faint);margin-bottom:8px;
+  }
+  .agenda ul{list-style:none;display:flex;flex-direction:column;gap:1px}
+  .agenda-item{
+    display:flex;align-items:center;gap:10px;
+    padding:5px 4px;border-radius:7px;cursor:pointer;
+    transition:background .12s;
+  }
+  .agenda-item:hover{background:var(--line-soft)}
+  .agenda-check{
+    flex:none;width:18px;height:18px;border-radius:50%;
+    border:1.5px solid var(--ink-faint);background:none;cursor:pointer;
+    padding:0;transition:border-color .12s, background .12s;
+  }
+  .agenda-check:hover{border-color:var(--amber)}
+  .agenda-when{
+    flex:none;min-width:74px;font-size:12px;color:var(--ink-dim);
+    font-variant-numeric:tabular-nums;
+  }
+  .agenda-when.soon{color:var(--amber)}
+  .agenda-when.overdue{color:#cf6a5a}
+  .agenda-when.urgent{color:#cf6a5a;font-weight:600}
+  .agenda-text{font-size:13.5px;color:var(--ink);flex:1;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .agenda-tag{
+    flex:none;font-size:10px;letter-spacing:.03em;text-transform:uppercase;
+    color:#cf6a5a;border:1px solid color-mix(in srgb,#cf6a5a 40%,transparent);
+    padding:1px 6px;border-radius:99px;
+  }
+
+  /* Each top-level task is frosted glass, clearly tinted by its theme colour. */
   .card{
     position:relative;
     background:
-      linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.012) 40px, transparent 90px),
-      var(--card-glass, rgba(40,40,46,.5));
-    -webkit-backdrop-filter:blur(18px) saturate(1.25);
-    backdrop-filter:blur(18px) saturate(1.25);
-    border:1px solid var(--card-edge, rgba(255,255,255,.10));
-    border-radius:18px;
-    box-shadow:0 8px 24px -14px rgba(0,0,0,.7);
+      linear-gradient(180deg,
+        color-mix(in srgb, var(--card-dot) 22%, transparent),
+        color-mix(in srgb, var(--card-dot) 10%, transparent)),
+      var(--panel);
+    -webkit-backdrop-filter:blur(24px) saturate(1.6);
+    backdrop-filter:blur(24px) saturate(1.6);
+    border:1px solid color-mix(in srgb, var(--card-dot) 38%, var(--line));
+    border-radius:22px;
+    box-shadow:
+      0 16px 40px -22px rgba(0,0,0,.75),
+      inset 0 1px 0 rgba(255,255,255,.18);
     overflow:hidden;
     transition:border-color .25s ease, box-shadow .3s ease, transform .18s ease,
                backdrop-filter .25s ease;
   }
-  /* a crisp 1px light line along the very top edge — the glass rim (not a streak) */
+  /* a coloured accent bar down the left edge — instant theme identification */
+  .card{ border-left:3px solid var(--card-dot); }
+  /* crisp light rim along the very top edge */
   .card::before{
-    content:"";position:absolute;left:12px;right:12px;top:0;height:1px;border-radius:1px;
-    background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
-    opacity:.6;z-index:2;pointer-events:none;
+    content:"";position:absolute;left:14px;right:14px;top:0;height:1px;border-radius:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
+    opacity:.7;z-index:2;pointer-events:none;
   }
   /* coloured glow that blooms behind the card when touched / open */
   .card .glow{
-    content:"";position:absolute;inset:0;border-radius:inherit;
+    position:absolute;inset:0;border-radius:inherit;
     background:radial-gradient(140% 90% at 50% -10%, var(--card-dot) 0%, transparent 60%);
     opacity:0;transition:opacity .35s ease;
     pointer-events:none;z-index:0;mix-blend-mode:screen;
   }
-  .card.lit .glow{opacity:.22}
+  .card.lit .glow{opacity:.30}
   .card.lit{
-    border-color:color-mix(in srgb, var(--card-dot) 45%, transparent);
+    border-color:color-mix(in srgb, var(--card-dot) 45%, var(--line));
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--card-dot) 22%, transparent),
-      0 12px 44px -18px color-mix(in srgb, var(--card-dot) 55%, transparent),
-      0 8px 24px -14px rgba(0,0,0,.7);
+      0 0 0 1px color-mix(in srgb, var(--card-dot) 20%, transparent),
+      0 16px 50px -20px color-mix(in srgb, var(--card-dot) 50%, transparent),
+      0 16px 40px -22px rgba(0,0,0,.75),
+      inset 0 1px 0 rgba(255,255,255,.18);
   }
   /* keep card content above the glow layer */
   .card > *{position:relative;z-index:1}
-  /* hover / press: the glass simply thickens (more blur), no white band */
-  .card:hover{ border-color:color-mix(in srgb, var(--card-dot) 35%, rgba(255,255,255,.12)); }
+  /* hover / press: the glass thickens slightly */
+  .card:hover{ border-color:color-mix(in srgb, var(--card-dot) 35%, var(--line)); }
   .card.pressed,.card:hover{
-    -webkit-backdrop-filter:blur(26px) saturate(1.4) brightness(1.04);
-    backdrop-filter:blur(26px) saturate(1.4) brightness(1.04);
+    -webkit-backdrop-filter:blur(30px) saturate(1.7) brightness(1.04);
+    backdrop-filter:blur(30px) saturate(1.7) brightness(1.04);
   }
   .card.dragover{border-color:var(--amber);box-shadow:0 0 0 1px var(--amber)}
   .card.done{opacity:.62}
 
   @supports not (backdrop-filter:blur(1px)){
-    .card{background:var(--card-glass-fallback, var(--panel))}
+    .card{background:var(--bg)}
+    body.light .card{background:#ffffff}
   }
+  body.light .card .glow{mix-blend-mode:soft-light}
+  body.light .card.lit .glow{opacity:.45}
 
   .task{
     display:flex;align-items:flex-start;gap:10px;
@@ -341,7 +446,7 @@
   .chip{
     display:inline-flex;align-items:center;gap:5px;font-size:11.5px;
     padding:2px 8px;border-radius:99px;border:1px solid var(--line);
-    color:var(--ink-dim);background:rgba(0,0,0,.15);
+    color:var(--ink-dim);background:var(--chip-bg);
   }
   .chip i{width:7px;height:7px;border-radius:50%;flex:none}
   .chip svg{width:12px;height:12px}
@@ -350,7 +455,7 @@
 
   /* ---- popovers ---- */
   .pop{
-    position:fixed;z-index:50;background:#211d15;border:1px solid var(--line);
+    position:fixed;z-index:50;background:var(--pop-bg);border:1px solid var(--line);
     border-radius:12px;padding:10px;box-shadow:0 12px 40px -8px rgba(0,0,0,.7);
     animation:pop .12s ease-out;
   }
@@ -458,11 +563,14 @@
 </style>
 </head>
 <body>
+<div class="aurora3" aria-hidden="true"></div>
 <div class="wrap">
   <header>
     <nav class="crumbs" id="crumbs"></nav>
     <div class="subtitle" id="subtitle"></div>
   </header>
+
+  <div id="agenda" class="agenda" style="display:none"></div>
 
   <ul class="list" id="list"></ul>
 
@@ -474,7 +582,7 @@
 
   <div class="footnote">
     <span>Tout doux · tout est enregistré sur cet appareil</span>
-    <span><a id="popout" style="display:none">⧉ fenêtre flottante</a><span id="popsep" style="display:none"> · </span><a id="export">exporter</a> · <a id="import">importer</a></span>
+    <span><a id="theme">☾ thème</a> · <a id="popout" style="display:none">⧉ fenêtre flottante</a><span id="popsep" style="display:none"> · </span><a id="export">exporter</a> · <a id="import">importer</a></span>
   </div>
 </div>
 
@@ -617,6 +725,7 @@
 
     renderCrumbs();
     renderSubtitle();
+    renderAgenda();
     renderTasks();
     save();
   }
@@ -655,6 +764,84 @@
     $subtitle.textContent = node.children.length ? "" : "aucune tâche pour l’instant";
     // Per-card progress and depth live on each card's badge — no global counter here.
   }
+
+  // "À faire cette semaine": tasks due within 7 days, plus anything marked
+  // Urgent. Only shown at the top level, and only when there's something.
+  const $agenda=document.getElementById('agenda');
+  function collectAgenda(){
+    const today=new Date(); today.setHours(0,0,0,0);
+    const items=[];
+    const walk=(n)=>{
+      for(const c of n.children){
+        if(!c.done){
+          let dueDiff=null;
+          if(c.due){
+            const d=new Date(c.due+"T00:00:00");
+            dueDiff=Math.round((d-today)/86400000);
+          }
+          const inWeek = dueDiff!==null && dueDiff<=7;   // includes overdue + next 7 days
+          const isUrgent = c.status==='urgent';
+          if(inWeek || isUrgent){
+            items.push({id:c.id, text:c.text, emoji:c.emoji, due:c.due, dueDiff, isUrgent});
+          }
+        }
+        walk(c);
+      }
+    };
+    walk(root);
+    // sort: dated items chronologically first, then undated urgents
+    items.sort((a,b)=>{
+      const ad=a.dueDiff===null?Infinity:a.dueDiff;
+      const bd=b.dueDiff===null?Infinity:b.dueDiff;
+      if(ad!==bd) return ad-bd;
+      return 0;
+    });
+    return items;
+  }
+
+  function renderAgenda(){
+    // only at the main menu (root focus)
+    if(path.length!==1){ $agenda.style.display='none'; return; }
+    const items=collectAgenda();
+    if(!items.length){ $agenda.style.display='none'; $agenda.innerHTML=''; return; }
+
+    const rows=items.map(it=>{
+      let when, cls='';
+      if(it.dueDiff!==null){
+        when=fmtDate(it.due);
+        const st=dateState(it.due);
+        cls=st||'';
+      } else {
+        when='—'; cls='urgent';
+      }
+      const tag = it.isUrgent ? `<span class="agenda-tag">urgent</span>` : '';
+      const label=(it.emoji?it.emoji+' ':'')+escapeHtml(it.text||'(sans titre)');
+      return `<li class="agenda-item" data-id="${it.id}">
+        <button class="agenda-check" data-check="${it.id}" aria-label="Marquer comme terminé"></button>
+        <span class="agenda-when ${cls}">${when}</span>
+        <span class="agenda-text" data-goto="${it.id}">${label}</span>
+        ${tag}
+      </li>`;
+    }).join('');
+
+    $agenda.innerHTML=`<h2>à faire cette semaine</h2><ul>${rows}</ul>`;
+    $agenda.style.display='';
+    // check button → mark the task done (it then leaves the recap)
+    $agenda.querySelectorAll('.agenda-check').forEach(btn=>{
+      btn.onclick=(e)=>{
+        e.stopPropagation();
+        const id=btn.dataset.check;
+        const t=nodes.get(id);
+        if(t){ navigator.vibrate&&navigator.vibrate(8); toggle(t); }
+      };
+    });
+    // tapping the text jumps to the task in its branch
+    $agenda.querySelectorAll('.agenda-text[data-goto]').forEach(el=>{
+      el.onclick=()=>{ const id=el.dataset.goto; if(nodes.has(id)) focusNode(id); };
+    });
+  }
+
+  function escapeHtml(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
   function renderTasks(){
     const node = current();
@@ -809,11 +996,8 @@
     const col=COLORS[t.color]||COLORS.slate;
     card.className="card"+(t.done?" done":"");
     card.dataset.id=t.id;
-    // glass: a translucent tint of the theme colour over the blurred backdrop
+    // theme colour drives the dot + the bloom/glow accent (glass itself is neutral)
     card.style.setProperty('--card-dot', col.dot);
-    card.style.setProperty('--card-glass', hexToRgba(col.tint, 0.55));
-    card.style.setProperty('--card-glass-fallback', col.tint);
-    card.style.setProperty('--card-edge', hexToRgba(col.dot, 0.28));
 
     // Card-only extra actions, surfaced in the ⋯ menu (emoji + colour).
     const extraActs=[
@@ -1296,6 +1480,32 @@
     inp.click();
   };
 
+  // ---------- theme toggle (dark default / light) ----------
+  (function setupTheme(){
+    const btn=document.getElementById('theme');
+    const KEY='tiroir.theme';
+    const apply=(t)=>{
+      document.body.classList.toggle('light', t==='light');
+      document.documentElement.classList.toggle('light', t==='light');
+      btn.textContent = t==='light' ? '☀ thème' : '☾ thème';
+      // keep the floating window (if open) in sync
+      try{
+        const w=window.documentPictureInPicture && documentPictureInPicture.window;
+        if(w){ w.document.body.className=document.body.className;
+          w.document.documentElement.className=document.documentElement.className;
+          w.document.documentElement.style.background = t==='light' ? '#efe9dc' : '#16140f'; }
+      }catch(e){}
+    };
+    let cur='dark';
+    try{ cur=localStorage.getItem(KEY)||'dark'; }catch(e){}
+    apply(cur);
+    btn.onclick=()=>{
+      cur = document.body.classList.contains('light') ? 'dark' : 'light';
+      apply(cur);
+      try{ localStorage.setItem(KEY, cur); }catch(e){}
+    };
+  })();
+
   // ---------- floating window (Document Picture-in-Picture) ----------
   // Pops the whole app into an always-on-top window (Chromium browsers: Arc,
   // Chrome, Edge, recent Firefox). Hidden where unsupported (e.g. Safari).
@@ -1318,9 +1528,16 @@
       document.querySelectorAll('style, link[rel="stylesheet"]').forEach(node=>{
         pipWin.document.head.appendChild(node.cloneNode(true));
       });
-      // styles (incl. the body gradient) come from the cloned stylesheets above
+      // carry the current theme into the floating window
+      pipWin.document.documentElement.className=document.documentElement.className;
+      pipWin.document.body.className=document.body.className;
       pipWin.document.body.style.margin="0";
-      pipWin.document.documentElement.style.background="#16140f";
+      // solid base background on both html and body so nothing shows through
+      const isLight=document.body.classList.contains('light');
+      const baseBg = isLight ? "#efe9dc" : "#16140f";
+      pipWin.document.documentElement.style.background = baseBg;
+      pipWin.document.body.style.background = baseBg;
+      pipWin.document.body.style.minHeight = "100%";
 
       // move the live app element into the floating window
       pipWin.document.body.appendChild(wrap);
